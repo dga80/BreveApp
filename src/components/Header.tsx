@@ -36,9 +36,9 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Fila Principal */}
         <div className="flex items-center justify-between h-14 sm:h-16">
           
-          {/* Marca Pragmapp */}
+          {/* Marca Pragmapp (Sin icono superior izquierdo) */}
           <div className="flex items-center space-x-2 shrink-0">
-            <PragmappLogo size="md" showText={true} />
+            <PragmappLogo size="md" showText={true} showIcon={false} />
           </div>
 
           {/* Fila Derecha: Historial, Selector de Caso y Ajustes */}

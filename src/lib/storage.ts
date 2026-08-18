@@ -55,12 +55,17 @@ export const StorageManager = {
       if (data) {
         const parsed = JSON.parse(data);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((c: any) => ({
-            ...c,
-            attemptedSolutions: Array.isArray(c?.attemptedSolutions) ? c.attemptedSolutions : [],
-            prescriptions: Array.isArray(c?.prescriptions) ? c.prescriptions : [],
-            notes: Array.isArray(c?.notes) ? c.notes : []
-          }));
+          const cleaned = parsed
+            .filter((c: any) => !c.title?.toLowerCase().includes('ejemplo') && !c.title?.toLowerCase().includes('rutinas'))
+            .map((c: any) => ({
+              ...c,
+              attemptedSolutions: Array.isArray(c?.attemptedSolutions) ? c.attemptedSolutions : [],
+              prescriptions: Array.isArray(c?.prescriptions) ? c.prescriptions : [],
+              notes: Array.isArray(c?.notes) ? c.notes : []
+            }));
+          if (cleaned.length > 0) {
+            return cleaned;
+          }
         }
       }
     } catch (e) {
