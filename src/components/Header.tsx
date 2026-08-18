@@ -59,7 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
               <select
                 value={activeCaseId}
                 onChange={(e) => onSelectCase(e.target.value)}
-                className="bg-transparent text-xs font-medium text-on-surface py-0.5 px-1.5 focus:outline-none cursor-pointer max-w-[110px] xs:max-w-[140px] sm:max-w-[180px] truncate"
+                className="bg-transparent text-xs font-semibold text-primary py-0.5 px-1.5 focus:outline-none cursor-pointer max-w-[110px] xs:max-w-[140px] sm:max-w-[180px] truncate"
               >
                 {cases.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -70,24 +70,24 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={onNewCase}
                 title="Nueva consulta"
-                className="p-1 hover:bg-surface-container-lowest text-on-surface-variant hover:text-primary rounded-lg transition-colors"
+                className="p-1 hover:bg-surface-container-lowest text-primary rounded-lg transition-colors"
               >
-                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
               </button>
             </div>
 
-            {/* Pestañas de Navegación Desktop (Texto Blanco sobre Verde Oscuro Corporativo) */}
-            <nav className="hidden md:flex space-x-1 bg-surface-container-low p-1 rounded-xl border border-surface-container-highest text-xs font-medium">
+            {/* Pestañas de Navegación Desktop */}
+            <nav className="hidden md:flex space-x-1 bg-surface-container-low p-1 rounded-xl border border-surface-container-highest text-xs font-semibold">
               <button
                 onClick={() => onTabChange('chat')}
                 className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all ${
                   activeTab === 'chat'
                     ? 'bg-primary text-white font-bold shadow-xs'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest'
+                    : 'text-primary hover:bg-surface-container-lowest'
                 }`}
               >
-                <MessageSquare className="w-3.5 h-3.5 text-white" />
-                <span className="text-white">Consulta</span>
+                <MessageSquare className={`w-3.5 h-3.5 ${activeTab === 'chat' ? 'text-white' : 'text-primary'}`} />
+                <span>Consulta</span>
               </button>
 
               <button
@@ -95,11 +95,11 @@ export const Header: React.FC<HeaderProps> = ({
                 className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all ${
                   activeTab === 'dashboard'
                     ? 'bg-primary text-white font-bold shadow-xs'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest'
+                    : 'text-primary hover:bg-surface-container-lowest'
                 }`}
               >
-                <FolderHeart className="w-3.5 h-3.5 text-white" />
-                <span className="text-white">Ficha y Pautas</span>
+                <FolderHeart className={`w-3.5 h-3.5 ${activeTab === 'dashboard' ? 'text-white' : 'text-primary'}`} />
+                <span>Ficha y Pautas</span>
                 {activePrescriptionsCount > 0 && (
                   <span className={`rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold ${
                     activeTab === 'dashboard' ? 'bg-white text-primary' : 'bg-primary text-white'
@@ -114,24 +114,24 @@ export const Header: React.FC<HeaderProps> = ({
                 className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all ${
                   activeTab === 'knowledge'
                     ? 'bg-primary text-white font-bold shadow-xs'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest'
+                    : 'text-primary hover:bg-surface-container-lowest'
                 }`}
               >
-                <BookOpen className="w-3.5 h-3.5 text-white" />
-                <span className="text-white">Biblioteca</span>
+                <BookOpen className={`w-3.5 h-3.5 ${activeTab === 'knowledge' ? 'text-white' : 'text-primary'}`} />
+                <span>Biblioteca</span>
               </button>
             </nav>
 
             {/* Ajustes */}
             <button
               onClick={onOpenSettings}
-              className="p-1.5 sm:p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container-low rounded-xl transition-colors border border-transparent hover:border-surface-container-highest"
+              className="p-1.5 sm:p-2 text-primary hover:bg-surface-container-low rounded-xl transition-colors border border-transparent hover:border-surface-container-highest"
               title="Configuración"
             >
               {isSyncing ? (
                 <RefreshCw className="w-4 h-4 animate-spin text-primary" />
               ) : (
-                <Settings className="w-4 h-4" />
+                <Settings className="w-4 h-4 text-primary" />
               )}
             </button>
           </div>
@@ -140,17 +140,17 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Fila Móvil Secundaria: Barra de Pestañas Flotante Móvil */}
         <div className="md:hidden pb-2 pt-0.5">
-          <nav className="grid grid-cols-3 gap-1 bg-surface-container-low p-1 rounded-xl border border-surface-container-highest text-xs font-medium">
+          <nav className="grid grid-cols-3 gap-1 bg-surface-container-low p-1 rounded-xl border border-surface-container-highest text-xs font-semibold">
             <button
               onClick={() => onTabChange('chat')}
               className={`py-1.5 rounded-lg flex items-center justify-center space-x-1.5 transition-all ${
                 activeTab === 'chat'
                   ? 'bg-primary text-white font-bold shadow-xs'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest'
+                  : 'text-primary hover:bg-surface-container-lowest'
               }`}
             >
-              <MessageSquare className="w-3.5 h-3.5 text-white" />
-              <span className="text-white">Consulta</span>
+              <MessageSquare className={`w-3.5 h-3.5 ${activeTab === 'chat' ? 'text-white' : 'text-primary'}`} />
+              <span>Consulta</span>
             </button>
 
             <button
@@ -158,11 +158,11 @@ export const Header: React.FC<HeaderProps> = ({
               className={`py-1.5 rounded-lg flex items-center justify-center space-x-1.5 transition-all ${
                 activeTab === 'dashboard'
                   ? 'bg-primary text-white font-bold shadow-xs'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest'
+                  : 'text-primary hover:bg-surface-container-lowest'
               }`}
             >
-              <FolderHeart className="w-3.5 h-3.5 text-white" />
-              <span className="text-white">Ficha</span>
+              <FolderHeart className={`w-3.5 h-3.5 ${activeTab === 'dashboard' ? 'text-white' : 'text-primary'}`} />
+              <span>Ficha</span>
               {activePrescriptionsCount > 0 && (
                 <span className={`rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold ${
                   activeTab === 'dashboard' ? 'bg-white text-primary' : 'bg-primary text-white'
@@ -177,11 +177,11 @@ export const Header: React.FC<HeaderProps> = ({
               className={`py-1.5 rounded-lg flex items-center justify-center space-x-1.5 transition-all ${
                 activeTab === 'knowledge'
                   ? 'bg-primary text-white font-bold shadow-xs'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest'
+                  : 'text-primary hover:bg-surface-container-lowest'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5 text-white" />
-              <span className="text-white">Biblioteca</span>
+              <BookOpen className={`w-3.5 h-3.5 ${activeTab === 'knowledge' ? 'text-white' : 'text-primary'}`} />
+              <span>Biblioteca</span>
             </button>
           </nav>
         </div>
