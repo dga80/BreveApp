@@ -2,23 +2,29 @@ import React, { useState } from 'react';
 import { CaseProfile, Prescription } from '../types';
 
 interface CaseDashboardProps {
-  activeCase: CaseProfile;
+  caseProfile?: CaseProfile;
+  activeCase?: CaseProfile;
   onUpdateCase: (updated: CaseProfile) => void;
-  onDeleteCase: (id: string) => void;
+  onNavigateToChat?: () => void;
+  onDeleteCase?: (id: string) => void;
 }
 
 export const CaseDashboard: React.FC<CaseDashboardProps> = ({
-  activeCase,
+  caseProfile,
+  activeCase: activeCaseProp,
   onUpdateCase,
+  onNavigateToChat,
   onDeleteCase
 }) => {
+  const activeCase = caseProfile || activeCaseProp;
+
   const [activeSubTab, setActiveSubTab] = useState<'pautas' | 'soluciones' | 'notas'>('pautas');
   
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [title, setTitle] = useState(activeCase.title);
-  const [childName, setChildName] = useState(activeCase.childName || '');
-  const [childAge, setChildAge] = useState(activeCase.childAge || '');
-  const [mainIssue, setMainIssue] = useState(activeCase.mainIssue || '');
+  const [title, setTitle] = useState(activeCase?.title || 'Nueva Consulta');
+  const [childName, setChildName] = useState(activeCase?.childName || '');
+  const [childAge, setChildAge] = useState(activeCase?.childAge || '');
+  const [mainIssue, setMainIssue] = useState(activeCase?.mainIssue || '');
   
   // New Attempted Solution
   const [newSolution, setNewSolution] = useState('');
@@ -31,10 +37,27 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
   const [rxTitle, setRxTitle] = useState('');
   const [rxDesc, setRxDesc] = useState('');
 
+  if (!activeCase) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-12 text-center bg-background min-h-[calc(100vh-4rem)]">
+        <h2 className="text-lg font-bold text-on-surface mb-2">No hay ninguna consulta seleccionada</h2>
+        <p className="text-xs text-on-surface-variant mb-6">Selecciona o inicia una consulta desde el menú principal.</p>
+        {onNavigateToChat && (
+          <button
+            onClick={onNavigateToChat}
+            className="px-6 py-2.5 bg-primary text-white font-bold text-xs rounded-xl shadow-xs"
+          >
+            Ir a Consulta
+          </button>
+        )}
+      </div>
+    );
+  }
+
   const handleSaveProfile = () => {
     onUpdateCase({
       ...activeCase,
-      title: title.trim() || 'Caso sin título',
+      title: title.trim() || 'Consulta sin título',
       childName: childName.trim(),
       childAge: childAge.trim(),
       mainIssue: mainIssue.trim(),
@@ -45,7 +68,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
 
   const handleAddAttemptedSolution = () => {
     if (!newSolution.trim()) return;
-    const list = [...activeCase.attemptedSolutions, newSolution.trim()];
+    const list = [...(activeCase.attemptedSolutions || []), newSolution.trim()];
     onUpdateCase({
       ...activeCase,
       attemptedSolutions: list,
@@ -55,7 +78,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
   };
 
   const handleRemoveAttemptedSolution = (idx: number) => {
-    const list = activeCase.attemptedSolutions.filter((_, i) => i !== idx);
+    const list = (activeCase.attemptedSolutions || []).filter((_, i) => i !== idx);
     onUpdateCase({
       ...activeCase,
       attemptedSolutions: list,
@@ -67,7 +90,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
     if (!newNote.trim()) return;
     const dateStr = new Date().toLocaleDateString('es-ES');
     const fullNote = `[${dateStr}] ${newNote.trim()}`;
-    const list = [fullNote, ...activeCase.notes];
+    const list = [fullNote, ...(activeCase.notes || [])];
     onUpdateCase({
       ...activeCase,
       notes: list,
@@ -77,7 +100,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
   };
 
   const handleRemoveNote = (idx: number) => {
-    const list = activeCase.notes.filter((_, i) => i !== idx);
+    const list = (activeCase.notes || []).filter((_, i) => i !== idx);
     onUpdateCase({
       ...activeCase,
       notes: list,
@@ -86,7 +109,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
   };
 
   const handleTogglePrescription = (rxId: string) => {
-    const updated = activeCase.prescriptions.map((p) =>
+    const updated = (activeCase.prescriptions || []).map((p) =>
       p.id === rxId ? { ...p, completed: !p.completed } : p
     );
     onUpdateCase({
@@ -97,7 +120,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
   };
 
   const handleDeletePrescription = (rxId: string) => {
-    const updated = activeCase.prescriptions.filter((p) => p.id !== rxId);
+    const updated = (activeCase.prescriptions || []).filter((p) => p.id !== rxId);
     onUpdateCase({
       ...activeCase,
       prescriptions: updated,
@@ -118,7 +141,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
     };
     onUpdateCase({
       ...activeCase,
-      prescriptions: [newRx, ...activeCase.prescriptions],
+      prescriptions: [newRx, ...(activeCase.prescriptions || [])],
       updatedAt: Date.now()
     });
     setRxTitle('');
@@ -126,17 +149,17 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
     setShowAddRx(false);
   };
 
-  const activeRxs = activeCase.prescriptions.filter((p) => !p.completed);
-  const completedRxs = activeCase.prescriptions.filter((p) => p.completed);
+  const activeRxs = (activeCase.prescriptions || []).filter((p) => !p.completed);
+  const completedRxs = (activeCase.prescriptions || []).filter((p) => p.completed);
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-6 bg-background min-h-[calc(100vh-4rem)] pb-24">
       
-      {/* Sección del Perfil Infantil (Stitch Child Profile Section) */}
+      {/* Sección del Perfil Infantil */}
       <section className="bg-surface-container-lowest rounded-2xl p-5 shadow-[0_4px_20px_rgba(15,118,110,0.04)] flex items-center gap-4 relative overflow-hidden border border-outline-variant/20">
         <div className="absolute top-0 left-0 w-2 h-full bg-secondary"></div>
         <div className="w-14 h-14 rounded-full overflow-hidden bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xl shrink-0 border-2 border-surface">
-          {activeCase.childName ? activeCase.childName[0].toUpperCase() : 'L'}
+          {activeCase.childName ? activeCase.childName[0].toUpperCase() : 'P'}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
@@ -151,11 +174,8 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
             </button>
           </div>
           <p className="font-body-sm text-xs text-outline flex items-center gap-1 mt-0.5 truncate">
-            <span className="material-symbols-outlined text-sm">psychology</span> Foco: {activeCase.mainIssue || 'Dificultad de límites'}
+            <span className="material-symbols-outlined text-sm">psychology</span> Foco: {activeCase.mainIssue || 'Consulta de Terapia Breve'}
           </p>
-        </div>
-        <div className="flex flex-col items-center justify-center w-11 h-11 rounded-full border-3 border-secondary-container text-secondary font-label-md text-xs font-bold shrink-0">
-          60%
         </div>
       </section>
 
@@ -163,7 +183,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
       {isEditingProfile && (
         <div className="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/30 space-y-3 text-xs">
           <div>
-            <label className="font-semibold text-on-surface">Título del caso / Familia:</label>
+            <label className="font-semibold text-on-surface">Título del caso / Consulta:</label>
             <input
               type="text"
               value={title}
@@ -178,6 +198,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
                 type="text"
                 value={childName}
                 onChange={(e) => setChildName(e.target.value)}
+                placeholder="ej. Lucas"
                 className="w-full mt-1 px-3 py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-xl"
               />
             </div>
@@ -187,17 +208,18 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
                 type="text"
                 value={childAge}
                 onChange={(e) => setChildAge(e.target.value)}
+                placeholder="ej. 8 años"
                 className="w-full mt-1 px-3 py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-xl"
               />
             </div>
           </div>
           <div>
-            <label className="font-semibold text-on-surface">Motivo de consulta:</label>
+            <label className="font-semibold text-on-surface">Foco / Problema principal:</label>
             <textarea
               value={mainIssue}
               onChange={(e) => setMainIssue(e.target.value)}
               rows={2}
-              className="w-full mt-1 px-3 py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-xl"
+              className="w-full mt-1 px-3 py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-xl resize-none"
             />
           </div>
           <div className="flex justify-end gap-2 pt-1">
@@ -211,7 +233,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
         </div>
       )}
 
-      {/* Barra de Pestañas de la Ficha (Stitch Tab Bar) */}
+      {/* Barra de Pestañas de la Ficha */}
       <nav className="flex gap-2 overflow-x-auto pb-1 no-scrollbar border-b border-outline-variant/20">
         <button
           onClick={() => setActiveSubTab('pautas')}
@@ -231,7 +253,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
               : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
           }`}
         >
-          Soluciones Intentadas ({activeCase.attemptedSolutions.length})
+          Soluciones Intentadas ({(activeCase.attemptedSolutions || []).length})
         </button>
         <button
           onClick={() => setActiveSubTab('notas')}
@@ -241,18 +263,18 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
               : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
           }`}
         >
-          Notas de Evolución ({activeCase.notes.length})
+          Evolución ({(activeCase.notes || []).length})
         </button>
       </nav>
 
-      {/* Pautas Activas Section */}
+      {/* Contenido Pautas */}
       {activeSubTab === 'pautas' && (
-        <section className="flex flex-col gap-4">
+        <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-headline-md text-lg font-bold text-on-surface">Pautas Activas</h2>
+            <h3 className="font-title-md text-sm font-bold text-on-surface">Pautas Conductuales Recomendadas</h3>
             <button
-              onClick={() => setShowAddRx(!showAddRx)}
-              className="text-xs bg-primary text-white px-3 py-1.5 rounded-xl font-medium flex items-center gap-1"
+              onClick={() => setShowAddRx(true)}
+              className="text-xs bg-primary/10 text-primary hover:bg-primary/20 font-bold px-3 py-1.5 rounded-xl border border-primary/20 flex items-center gap-1"
             >
               <span className="material-symbols-outlined text-sm">add</span> Nueva Pauta
             </button>
@@ -260,154 +282,190 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
 
           {showAddRx && (
             <form onSubmit={handleCreatePrescription} className="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/30 space-y-3 text-xs">
-              <input
-                type="text"
-                required
-                placeholder="Título de la pauta conductual..."
-                value={rxTitle}
-                onChange={(e) => setRxTitle(e.target.value)}
-                className="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-xl"
-              />
-              <textarea
-                placeholder="Instrucciones paso a paso..."
-                rows={2}
-                value={rxDesc}
-                onChange={(e) => setRxDesc(e.target.value)}
-                className="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-xl"
-              />
-              <div className="flex justify-end">
-                <button type="submit" className="px-4 py-1.5 bg-primary text-white rounded-xl font-semibold">
-                  Asignar Pauta
+              <div>
+                <label className="font-semibold text-on-surface">Título de la pauta:</label>
+                <input
+                  type="text"
+                  value={rxTitle}
+                  onChange={(e) => setRxTitle(e.target.value)}
+                  placeholder="ej. Experimento del silencio"
+                  className="w-full mt-1 px-3 py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-xl"
+                  required
+                />
+              </div>
+              <div>
+                <label className="font-semibold text-on-surface">Instrucciones / Paso a paso:</label>
+                <textarea
+                  value={rxDesc}
+                  onChange={(e) => setRxDesc(e.target.value)}
+                  rows={3}
+                  placeholder="Describe cómo aplicarla..."
+                  className="w-full mt-1 px-3 py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-xl resize-none"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddRx(false)}
+                  className="px-3 py-1.5 bg-surface-container text-on-surface-variant rounded-xl"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 bg-primary text-white font-bold rounded-xl"
+                >
+                  Guardar Pauta
                 </button>
               </div>
             </form>
           )}
 
-          {activeRxs.length === 0 ? (
-            <div className="text-center py-8 bg-surface-container-lowest rounded-2xl border border-dashed border-outline-variant/30">
-              <span className="material-symbols-outlined text-3xl text-primary/40 mb-2">assignment</span>
-              <p className="text-xs font-semibold text-on-surface">No hay pautas activas registradas</p>
+          {activeRxs.length === 0 && completedRxs.length === 0 ? (
+            <div className="bg-surface-container-lowest rounded-2xl p-6 text-center border border-outline-variant/20">
+              <span className="material-symbols-outlined text-3xl text-outline mb-2">assignment</span>
+              <p className="text-xs text-on-surface-variant">No hay pautas registradas en esta consulta aún.</p>
+              {onNavigateToChat && (
+                <button
+                  onClick={onNavigateToChat}
+                  className="mt-3 text-xs text-primary font-bold hover:underline"
+                >
+                  Consultar al terapeuta virtual →
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-3">
               {activeRxs.map((rx) => (
-                <div
-                  key={rx.id}
-                  className="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(15,118,110,0.04)] relative overflow-hidden p-4 pl-6 flex justify-between items-center group cursor-pointer border border-outline-variant/20"
-                >
-                  <div className="absolute top-0 left-0 w-2 h-full bg-tertiary-container"></div>
-                  <div>
-                    <h3 className="font-label-md text-sm font-semibold text-on-surface mb-0.5">{rx.title}</h3>
-                    <p className="font-body-sm text-xs text-outline line-clamp-1">{rx.description || 'En curso - Terapia Breve'}</p>
+                <div key={rx.id} className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/20 flex items-start justify-between gap-3 shadow-2xs">
+                  <div className="space-y-1 min-w-0">
+                    <h4 className="font-bold text-xs text-on-surface">{rx.title}</h4>
+                    <p className="text-xs text-on-surface-variant">{rx.description}</p>
+                    <span className="text-[10px] text-outline block mt-1">Asignada: {rx.assignedDate}</span>
                   </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => handleTogglePrescription(rx.id)}
+                      className="p-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-xl text-xs font-bold"
+                      title="Marcar como completada"
+                    >
+                      <span className="material-symbols-outlined text-base">check</span>
+                    </button>
+                    <button
+                      onClick={() => handleDeletePrescription(rx.id)}
+                      className="p-1.5 text-outline hover:text-red-500 rounded-xl text-xs"
+                      title="Eliminar"
+                    >
+                      <span className="material-symbols-outlined text-base">delete</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {completedRxs.length > 0 && (
+                <div className="pt-4 border-t border-outline-variant/20">
+                  <h4 className="text-xs font-bold text-outline mb-2">Pautas Completadas ({completedRxs.length})</h4>
+                  <div className="space-y-2 opacity-60">
+                    {completedRxs.map((rx) => (
+                      <div key={rx.id} className="bg-surface-container-low p-3 rounded-xl flex items-center justify-between text-xs">
+                        <span className="line-through">{rx.title}</span>
+                        <button
+                          onClick={() => handleTogglePrescription(rx.id)}
+                          className="text-primary hover:underline text-[11px]"
+                        >
+                          Reactivar
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Contenido Soluciones Intentadas */}
+      {activeSubTab === 'soluciones' && (
+        <section className="space-y-4">
+          <h3 className="font-title-md text-sm font-bold text-on-surface">Soluciones Intentadas que Han Fallado</h3>
+          
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newSolution}
+              onChange={(e) => setNewSolution(e.target.value)}
+              placeholder="ej. Sermones de 20 minutos, Castigos sin consola..."
+              className="flex-1 px-3 py-2 text-xs bg-surface-container-lowest border border-outline-variant/30 rounded-xl"
+            />
+            <button
+              onClick={handleAddAttemptedSolution}
+              className="px-4 py-2 bg-primary text-white font-bold text-xs rounded-xl shrink-0"
+            >
+              Añadir
+            </button>
+          </div>
+
+          {(activeCase.attemptedSolutions || []).length === 0 ? (
+            <p className="text-xs text-on-surface-variant text-center py-6">No hay soluciones intentadas registradas.</p>
+          ) : (
+            <div className="space-y-2">
+              {(activeCase.attemptedSolutions || []).map((sol, idx) => (
+                <div key={idx} className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/20 flex items-center justify-between text-xs">
+                  <span className="text-on-surface">{sol}</span>
                   <button
-                    onClick={() => handleTogglePrescription(rx.id)}
-                    className="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0"
+                    onClick={() => handleRemoveAttemptedSolution(idx)}
+                    className="text-outline hover:text-red-500 p-1"
                   >
-                    <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      check_circle
-                    </span>
+                    <span className="material-symbols-outlined text-sm">close</span>
                   </button>
                 </div>
               ))}
             </div>
           )}
-
-          {completedRxs.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-outline-variant/20">
-              <h3 className="font-label-md text-xs font-bold text-outline uppercase tracking-wider mb-2">Completadas</h3>
-              <div className="space-y-2">
-                {completedRxs.map((rx) => (
-                  <div key={rx.id} className="bg-surface-container-low rounded-xl p-3 flex justify-between items-center opacity-70">
-                    <span className="text-xs line-through text-on-surface-variant">{rx.title}</span>
-                    <button onClick={() => handleTogglePrescription(rx.id)} className="text-secondary">
-                      <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </section>
       )}
 
-      {/* Soluciones Intentadas Section (Stitch Attempted Solutions Section) */}
-      {activeSubTab === 'soluciones' && (
-        <section className="flex flex-col gap-4 bg-error-container/20 p-6 rounded-2xl border border-error-container/40">
-          <h2 className="font-headline-md text-lg font-bold text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-tertiary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
-            Soluciones Intentadas Erróneas <span className="text-tertiary font-body-sm text-xs font-normal">(A Evitar)</span>
-          </h2>
-          <p className="text-xs text-on-surface-variant leading-relaxed">
-            Identificar lo que <strong>ya habéis intentado y no ha funcionado</strong> evita repetir el mismo círculo vicioso.
-          </p>
-
-          <ul className="flex flex-col gap-2.5">
-            {activeCase.attemptedSolutions.map((sol, idx) => (
-              <li key={idx} className="flex items-center justify-between gap-3 p-3 bg-surface-container-lowest rounded-xl shadow-xs border border-error-container/30">
-                <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-tertiary text-xl">block</span>
-                  <span className="font-body-md text-xs text-on-surface font-medium">{sol}</span>
-                </div>
-                <button onClick={() => handleRemoveAttemptedSolution(idx)} className="text-outline hover:text-red-600">
-                  <span className="material-symbols-outlined text-base">delete</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-
-          <div className="flex gap-2 pt-2">
-            <input
-              type="text"
-              placeholder="Añadir solución intentada fallida (ej. Dar sermones largos)..."
-              value={newSolution}
-              onChange={(e) => setNewSolution(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleAddAttemptedSolution();
-              }}
-              className="flex-1 px-3 py-2 text-xs bg-surface-container-lowest border border-error-container/40 rounded-xl"
-            />
-            <button onClick={handleAddAttemptedSolution} className="px-3.5 py-2 bg-tertiary text-white rounded-xl text-xs font-semibold">
-              Añadir
-            </button>
-          </div>
-        </section>
-      )}
-
-      {/* Notas de Evolución Section */}
+      {/* Contenido Evolución / Notas */}
       {activeSubTab === 'notas' && (
-        <section className="flex flex-col gap-4 bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/20">
-          <h2 className="font-headline-md text-lg font-bold text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-xl">edit_note</span>
-            Diario de Evolución Terapéutica
-          </h2>
-
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Anotar observación de la semana..."
+        <section className="space-y-4">
+          <h3 className="font-title-md text-sm font-bold text-on-surface">Notas de Evolución</h3>
+          
+          <div className="space-y-2">
+            <textarea
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleAddNote();
-              }}
-              className="flex-1 px-3.5 py-2 text-xs bg-surface-container-low border border-outline-variant/30 rounded-xl"
+              rows={2}
+              placeholder="Registra avances o cambios en la dinámica..."
+              className="w-full px-3 py-2 text-xs bg-surface-container-lowest border border-outline-variant/30 rounded-xl resize-none"
             />
-            <button onClick={handleAddNote} className="px-4 py-2 bg-on-surface text-surface rounded-xl text-xs font-semibold">
-              Anotar
-            </button>
+            <div className="flex justify-end">
+              <button
+                onClick={handleAddNote}
+                className="px-4 py-1.5 bg-primary text-white font-bold text-xs rounded-xl"
+              >
+                Añadir Nota
+              </button>
+            </div>
           </div>
 
-          <div className="space-y-2 max-h-64 overflow-y-auto pt-2">
-            {activeCase.notes.map((note, idx) => (
-              <div key={idx} className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/20 flex items-start justify-between gap-2 text-xs text-on-surface">
-                <span>{note}</span>
-                <button onClick={() => handleRemoveNote(idx)} className="text-outline hover:text-red-500">
-                  <span className="material-symbols-outlined text-sm">delete</span>
-                </button>
-              </div>
-            ))}
-          </div>
+          {(activeCase.notes || []).length === 0 ? (
+            <p className="text-xs text-on-surface-variant text-center py-6">No hay notas registradas en la evolución.</p>
+          ) : (
+            <div className="space-y-2">
+              {(activeCase.notes || []).map((note, idx) => (
+                <div key={idx} className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/20 flex items-start justify-between text-xs gap-2">
+                  <p className="text-on-surface whitespace-pre-wrap">{note}</p>
+                  <button
+                    onClick={() => handleRemoveNote(idx)}
+                    className="text-outline hover:text-red-500 p-1 shrink-0"
+                  >
+                    <span className="material-symbols-outlined text-sm">delete</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       )}
 
