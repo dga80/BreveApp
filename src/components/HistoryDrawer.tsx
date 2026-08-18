@@ -50,17 +50,17 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
           </button>
         </div>
 
-        {/* Botón de Nueva Consulta Directa */}
+        {/* Botón de Nueva Consulta Directa - TEXTO Y ICONO CLARO SOBRE VERDE OSCURO */}
         <div className="p-4 border-b border-surface-container-highest">
           <button
             onClick={() => {
               onNewConsultation();
               onClose();
             }}
-            className="w-full bg-primary hover:bg-primary/90 text-stitch-lightMint rounded-xl py-2.5 px-4 font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-transform active:scale-98"
+            className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl py-2.5 px-4 font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-transform active:scale-98"
           >
-            <Plus className="w-4 h-4 text-stitch-lightMint" />
-            <span>Iniciar Nueva Consulta</span>
+            <Plus className="w-4 h-4 text-white" />
+            <span className="text-white">Nueva Consulta</span>
           </button>
         </div>
 
@@ -102,9 +102,9 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
                 >
                   <div className="flex items-start gap-2.5 min-w-0">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-xs font-bold ${
-                      isActive ? 'bg-primary text-stitch-lightMint' : 'bg-surface-container text-on-surface-variant'
+                      isActive ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant'
                     }`}>
-                      <MessageSquare className="w-4 h-4" />
+                      <MessageSquare className="w-4 h-4 text-white" />
                     </div>
                     <div className="min-w-0">
                       <h4 className={`text-xs font-bold truncate ${isActive ? 'text-primary' : 'text-on-surface'}`}>

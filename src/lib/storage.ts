@@ -1,11 +1,10 @@
 import { CaseProfile, ChatSession, AppSettings } from '../types';
 
-const SETTINGS_KEY = 'breveapp_settings';
-const CASES_KEY = 'breveapp_cases';
-const SESSIONS_KEY = 'breveapp_sessions';
-const ACTIVE_CASE_KEY = 'breveapp_active_case_id';
+const SETTINGS_KEY = 'pragmapp_settings';
+const CASES_KEY = 'pragmapp_cases';
+const SESSIONS_KEY = 'pragmapp_sessions';
+const ACTIVE_CASE_KEY = 'pragmapp_active_case_id';
 
-// Default initial settings
 export const DEFAULT_SETTINGS: AppSettings = {
   geminiApiKey: '',
   modelName: 'gemini-2.5-flash',
@@ -15,32 +14,18 @@ export const DEFAULT_SETTINGS: AppSettings = {
   syncEnabled: false
 };
 
-// Initial default demo case
+// Default clean case without demo clutter
 export const DEFAULT_CASES: CaseProfile[] = [
   {
     id: 'case_default_1',
-    title: 'Caso de ejemplo - Rutinas y pantallas',
-    childName: 'Lucas',
-    childAge: '7 años',
-    mainIssue: 'Dificultad para apagar la tablet al terminar el tiempo pactado y constantes quejas para vestirse por las mañanas.',
-    attemptedSolutions: [
-      'Avisarle 4 o 5 veces antes de apagar',
-      'Amenazar con no ver dibujos en una semana',
-      'Ayudarle a vestirse corriendo para no llegar tarde'
-    ],
-    prescriptions: [
-      {
-        id: 'rx_demo_1',
-        title: 'La regla del aviso único con alarma visible',
-        description: 'Poner un reloj de arena o alarma en la tablet. Al sonar, se apaga sin discursos ni discusiones.',
-        category: 'pantallas',
-        assignedDate: new Date().toLocaleDateString('es-ES'),
-        completed: false,
-        notes: 'Listo para probar esta tarde.'
-      }
-    ],
+    title: 'Nueva Consulta',
+    childName: '',
+    childAge: '',
+    mainIssue: 'Consulta de Terapia Breve Estratégica Familiar',
+    attemptedSolutions: [],
+    prescriptions: [],
     notes: [
-      'Primera evaluación: Los padres están agotados de repetir lo mismo todos los días. Se reestructura para pasar de la palabra a la acción serena.'
+      `[${new Date().toLocaleDateString('es-ES')}] Apertura de ficha en Pragmapp.`
     ],
     createdAt: Date.now(),
     updatedAt: Date.now()
@@ -48,10 +33,9 @@ export const DEFAULT_CASES: CaseProfile[] = [
 ];
 
 export const StorageManager = {
-  // Settings
   getSettings(): AppSettings {
     try {
-      const data = localStorage.getItem(SETTINGS_KEY);
+      const data = localStorage.getItem(SETTINGS_KEY) || localStorage.getItem('breveapp_settings');
       if (data) {
         return { ...DEFAULT_SETTINGS, ...JSON.parse(data) };
       }
@@ -65,20 +49,23 @@ export const StorageManager = {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   },
 
-  // Cases
   getCases(): CaseProfile[] {
     try {
-      const data = localStorage.getItem(CASES_KEY);
+      const data = localStorage.getItem(CASES_KEY) || localStorage.getItem('breveapp_cases');
       if (data) {
         const parsed = JSON.parse(data);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          return parsed.map((c: any) => ({
+            ...c,
+            attemptedSolutions: Array.isArray(c?.attemptedSolutions) ? c.attemptedSolutions : [],
+            prescriptions: Array.isArray(c?.prescriptions) ? c.prescriptions : [],
+            notes: Array.isArray(c?.notes) ? c.notes : []
+          }));
         }
       }
     } catch (e) {
       console.error('Error loading cases:', e);
     }
-    // Return default cases if empty
     this.saveCases(DEFAULT_CASES);
     return DEFAULT_CASES;
   },
@@ -88,24 +75,23 @@ export const StorageManager = {
   },
 
   getActiveCaseId(): string {
-    const active = localStorage.getItem(ACTIVE_CASE_KEY);
+    const active = localStorage.getItem(ACTIVE_CASE_KEY) || localStorage.getItem('breveapp_active_case_id');
     if (active) return active;
     const cases = this.getCases();
     if (cases.length > 0) {
       this.setActiveCaseId(cases[0].id);
       return cases[0].id;
     }
-    return '';
+    return 'case_default_1';
   },
 
   setActiveCaseId(id: string): void {
     localStorage.setItem(ACTIVE_CASE_KEY, id);
   },
 
-  // Sessions
   getSessions(): Record<string, ChatSession> {
     try {
-      const data = localStorage.getItem(SESSIONS_KEY);
+      const data = localStorage.getItem(SESSIONS_KEY) || localStorage.getItem('breveapp_sessions');
       if (data) {
         return JSON.parse(data);
       }
@@ -118,24 +104,20 @@ export const StorageManager = {
   getSessionByCaseId(caseId: string): ChatSession {
     const sessions = this.getSessions();
     if (sessions[caseId]) {
-      return sessions[caseId];
+      return {
+        ...sessions[caseId],
+        messages: Array.isArray(sessions[caseId]?.messages) ? sessions[caseId].messages : []
+      };
     }
-    // Create new session for this case
+    // Create new session with empty messages array so user starts on Gemini landing page
     const newSession: ChatSession = {
       id: 'session_' + Date.now(),
-      caseId: caseId,
-      messages: [
-        {
-          id: 'welcome_msg',
-          role: 'assistant',
-          content: `¡Hola! Soy tu **Consultor y Terapeuta Virtual en Terapia Breve Estratégica**, basado en el enfoque clínico y las obras de **Maribel Martínez** (*«¿Cuántas veces te lo tengo que decir?»*, *«Niños sin miedos»*).\n\n¿En qué situación familiar o de crianza os encontráis encallados hoy? Cuéntame qué está ocurriendo y, sobre todo, **qué habéis intentado ya para solucionarlo**.`,
-          timestamp: Date.now()
-        }
-      ],
+      caseId: caseId || 'case_default_1',
+      messages: [],
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
-    sessions[caseId] = newSession;
+    sessions[caseId || 'case_default_1'] = newSession;
     this.saveSessions(sessions);
     return newSession;
   },
@@ -150,14 +132,13 @@ export const StorageManager = {
     this.saveSessions(sessions);
   },
 
-  // Export / Import all data
   exportAllData(): string {
     const data = {
       version: '1.0',
       exportedAt: new Date().toISOString(),
       cases: this.getCases(),
       sessions: this.getSessions(),
-      settings: { ...this.getSettings(), geminiApiKey: '', githubToken: '' } // Don't export secret tokens
+      settings: { ...this.getSettings(), geminiApiKey: '', githubToken: '' }
     };
     return JSON.stringify(data, null, 2);
   },
@@ -174,7 +155,6 @@ export const StorageManager = {
     }
   },
 
-  // Sincronización con GitHub REST API
   async syncWithGitHub(token: string, repo: string, branch = 'main'): Promise<{ success: boolean; message: string }> {
     if (!token || !repo) {
       return { success: false, message: 'Falta configurar el Token de GitHub o el repositorio (ej. dga80/BreveApp).' };
@@ -192,7 +172,6 @@ export const StorageManager = {
       const path = 'data/persistence_store.json';
       const fileUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
 
-      // Check if file already exists to get its SHA
       let currentSha: string | undefined;
       try {
         const getRes = await fetch(fileUrl, {
@@ -206,15 +185,14 @@ export const StorageManager = {
           currentSha = fileData.sha;
         }
       } catch (err) {
-        // file doesn't exist yet, proceed
+        // file doesn't exist yet
       }
 
-      // Encode content in base64 (browser utf-8 safe)
       const jsonStr = JSON.stringify(contentPayload, null, 2);
       const encodedContent = btoa(unescape(encodeURIComponent(jsonStr)));
 
       const commitBody: any = {
-        message: `Sync BreveApp data [${new Date().toLocaleDateString('es-ES')} ${new Date().toLocaleTimeString('es-ES')}]`,
+        message: `Sync Pragmapp data [${new Date().toLocaleDateString('es-ES')} ${new Date().toLocaleTimeString('es-ES')}]`,
         content: encodedContent,
         branch: branch
       };

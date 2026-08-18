@@ -5,11 +5,16 @@ import { CaseDashboard } from './components/CaseDashboard';
 import { KnowledgeLibrary } from './components/KnowledgeLibrary';
 import { SettingsModal } from './components/SettingsModal';
 import { BottomNav } from './components/BottomNav';
+import { SplashScreen } from './components/SplashScreen';
+import { HistoryDrawer } from './components/HistoryDrawer';
 import { CaseProfile, ChatSession, AppSettings, Message, Prescription } from './types';
 import { StorageManager } from './lib/storage';
 import { sendChatMessage } from './lib/gemini';
 
 export const App: React.FC = () => {
+  const [showSplash, setShowSplash] = useState(true);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
   const [settings, setSettings] = useState<AppSettings>(() => {
     const s = StorageManager.getSettings();
     if (!s.geminiApiKey) {
@@ -29,7 +34,7 @@ export const App: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const activeCase = cases.find((c) => c.id === activeCaseId) || cases[0];
+  const activeCase = (cases || []).find((c) => c.id === activeCaseId) || cases[0];
   const activePrescriptionsCount = activeCase?.prescriptions?.filter(p => !p.completed).length || 0;
 
   useEffect(() => {
@@ -56,93 +61,84 @@ export const App: React.FC = () => {
       timestamp: Date.now()
     };
 
-    const updatedMessages = [...session.messages, userMessage];
-    const newSession: ChatSession = {
-      ...session,
-      messages: updatedMessages,
-      updatedAt: Date.now()
-    };
+    const updatedMessages = [...(session.messages || []), userMessage];
+    const updatedSession = { ...session, messages: updatedMessages, updatedAt: Date.now() };
+    setSession(updatedSession);
+    StorageManager.saveSession(updatedSession);
 
-    setSession(newSession);
-    StorageManager.saveSession(newSession);
     setIsLoading(true);
 
     try {
-      const response = await sendChatMessage({
-        apiKey: settings.geminiApiKey,
-        modelName: settings.modelName,
-        messages: updatedMessages,
-        activeCase: activeCase,
-        enableSearchGrounding: settings.enableSearchGrounding
-      });
+      const response = await sendChatMessage(
+        updatedMessages,
+        activeCase,
+        settings.geminiApiKey,
+        settings.modelName || 'gemini-2.5-flash',
+        settings.enableSearchGrounding ?? true
+      );
 
       const assistantMessage: Message = {
         id: 'msg_a_' + Date.now(),
         role: 'assistant',
         content: response.text,
         timestamp: Date.now(),
-        prescriptions: response.prescriptions,
+        prescriptions: response.extractedPrescriptions,
         sources: response.sources
       };
 
       const finalMessages = [...updatedMessages, assistantMessage];
-      const finalSession: ChatSession = {
-        ...session,
-        messages: finalMessages,
-        updatedAt: Date.now()
-      };
-
+      const finalSession = { ...session, messages: finalMessages, updatedAt: Date.now() };
       setSession(finalSession);
       StorageManager.saveSession(finalSession);
-
-      if (response.prescriptions && response.prescriptions.length > 0) {
-        const existingIds = new Set(activeCase.prescriptions.map(p => p.title.toLowerCase()));
-        const newRxs = response.prescriptions.filter(p => !existingIds.has(p.title.toLowerCase()));
-        
-        if (newRxs.length > 0) {
-          const updatedCase: CaseProfile = {
-            ...activeCase,
-            prescriptions: [...newRxs, ...activeCase.prescriptions],
-            updatedAt: Date.now()
-          };
-          handleUpdateCase(updatedCase);
-        }
-      }
     } catch (error: any) {
-      console.error('Error al generar respuesta:', error);
+      console.error('Error sending message:', error);
       const errorMessage: Message = {
         id: 'msg_err_' + Date.now(),
         role: 'assistant',
-        content: `⚠️ **Ha ocurrido un error al conectar con el terapeuta:**\n\n${error.message || 'Comprueba tu conexión y tu API Key en los Ajustes.'}`,
+        content: `⚠️ **Error de conexión:** ${error.message || 'No se pudo comunicar con el servidor de IA.'}`,
         timestamp: Date.now()
       };
-
-      const finalMessages = [...updatedMessages, errorMessage];
-      const errSession: ChatSession = {
-        ...session,
-        messages: finalMessages,
-        updatedAt: Date.now()
-      };
-      setSession(errSession);
-      StorageManager.saveSession(errSession);
+      const errorSession = { ...session, messages: [...updatedMessages, errorMessage], updatedAt: Date.now() };
+      setSession(errorSession);
+      StorageManager.saveSession(errorSession);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleNewCase = () => {
-    const childName = prompt('Nombre del hijo/a o título del caso familiar (ej: "Sofía (9 años)"):');
-    if (!childName) return;
+  const handleAddPrescription = (prescription: Prescription) => {
+    if (!activeCase) return;
 
+    const exists = (activeCase.prescriptions || []).some(p => p.title === prescription.title);
+    if (exists) {
+      alert('Esta pauta ya está guardada en la ficha del caso.');
+      return;
+    }
+
+    const updatedCase = {
+      ...activeCase,
+      prescriptions: [...(activeCase.prescriptions || []), prescription],
+      updatedAt: Date.now()
+    };
+
+    const updatedCases = cases.map(c => c.id === activeCase.id ? updatedCase : c);
+    setCases(updatedCases);
+    StorageManager.saveCases(updatedCases);
+
+    alert(`¡Pauta "${prescription.title}" guardada correctamente en la ficha!`);
+  };
+
+  const handleCreateNewCase = () => {
+    const caseNum = cases.length + 1;
     const newCase: CaseProfile = {
       id: 'case_' + Date.now(),
-      title: `Caso ${childName.trim()}`,
-      childName: childName.trim(),
+      title: `Consulta #${caseNum}`,
+      childName: '',
       childAge: '',
-      mainIssue: 'Nuevo caso familiar en evaluación.',
+      mainIssue: 'Consulta de Terapia Breve Estratégica',
       attemptedSolutions: [],
       prescriptions: [],
-      notes: [`[${new Date().toLocaleDateString('es-ES')}] Apertura de ficha para consulta.`],
+      notes: [`[${new Date().toLocaleDateString('es-ES')}] Apertura de consulta en Pragmapp.`],
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
@@ -154,72 +150,62 @@ export const App: React.FC = () => {
     setActiveTab('chat');
   };
 
-  const handleUpdateCase = (updated: CaseProfile) => {
-    const updatedCases = cases.map((c) => (c.id === updated.id ? updated : c));
-    setCases(updatedCases);
-    StorageManager.saveCases(updatedCases);
-  };
-
   const handleDeleteCase = (id: string) => {
     if (cases.length <= 1) {
-      alert('Debe existir al menos un caso activo.');
+      alert('Debe existir al menos una consulta en la aplicación.');
       return;
     }
-    const updatedCases = cases.filter((c) => c.id !== id);
+    const updatedCases = cases.filter(c => c.id !== id);
     setCases(updatedCases);
     StorageManager.saveCases(updatedCases);
-    setActiveCaseId(updatedCases[0].id);
-  };
-
-  const handleAddPrescription = (prescription: Prescription) => {
-    if (!activeCase) return;
-    const exists = activeCase.prescriptions.some((p) => p.title === prescription.title);
-    if (exists) {
-      alert('Esta pauta ya está guardada en la ficha del caso.');
-      return;
+    if (activeCaseId === id) {
+      setActiveCaseId(updatedCases[0].id);
     }
-    const updatedCase: CaseProfile = {
-      ...activeCase,
-      prescriptions: [prescription, ...activeCase.prescriptions],
-      updatedAt: Date.now()
-    };
-    handleUpdateCase(updatedCase);
-    alert(`¡Pauta "${prescription.title}" guardada en la Ficha del Caso!`);
   };
 
-  const handleSaveSettings = (newSettings: AppSettings) => {
-    setSettings(newSettings);
-    StorageManager.saveSettings(newSettings);
-  };
-
-  const handleDataImported = () => {
-    setCases(StorageManager.getCases());
-    const actId = StorageManager.getActiveCaseId();
-    setActiveCaseId(actId);
-    setSession(StorageManager.getSessionByCaseId(actId));
-    setIsSettingsOpen(false);
-  };
-
-  const handleApplyCasePromptFromLibrary = (promptText: string) => {
-    setActiveTab('chat');
-    handleSendMessage(promptText);
+  const handleUpdateCase = (updatedCase: CaseProfile) => {
+    const updatedCases = cases.map(c => c.id === updatedCase.id ? updatedCase : c);
+    setCases(updatedCases);
+    StorageManager.saveCases(updatedCases);
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-background flex flex-col font-sans antialiased">
-      {/* Header */}
+    <div className="min-h-screen bg-stone-50 text-stone-800 flex flex-col font-sans selection:bg-teal-100 selection:text-teal-900">
+      
+      {/* Splash Screen */}
+      {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
+
+      {/* Header Superior */}
       <Header
         cases={cases}
-        activeCaseId={activeCase?.id || ''}
-        onSelectCase={setActiveCaseId}
-        onNewCase={handleNewCase}
+        activeCaseId={activeCaseId}
+        onSelectCase={(id) => {
+          setActiveCaseId(id);
+          setActiveTab('chat');
+        }}
+        onNewCase={handleCreateNewCase}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenHistory={() => setIsHistoryOpen(true)}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 pb-16 md:pb-0">
+      {/* Drawer de Historial de Consultas */}
+      <HistoryDrawer
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        cases={cases}
+        activeCaseId={activeCaseId}
+        onSelectCase={(id) => {
+          setActiveCaseId(id);
+          setActiveTab('chat');
+        }}
+        onNewConsultation={handleCreateNewCase}
+        onDeleteCase={handleDeleteCase}
+      />
+
+      {/* Contenido Principal por Pestañas */}
+      <main className="flex-1 flex flex-col w-full max-w-7xl mx-auto px-0 sm:px-4 md:px-6 py-0 sm:py-4">
         {activeTab === 'chat' && (
           <ChatInterface
             messages={session?.messages || []}
@@ -227,36 +213,49 @@ export const App: React.FC = () => {
             isLoading={isLoading}
             activeCase={activeCase}
             onAddPrescription={handleAddPrescription}
+            onStartNewConsultation={handleCreateNewCase}
+            onOpenHistory={() => setIsHistoryOpen(true)}
           />
         )}
 
         {activeTab === 'dashboard' && activeCase && (
           <CaseDashboard
-            activeCase={activeCase}
+            caseProfile={activeCase}
             onUpdateCase={handleUpdateCase}
-            onDeleteCase={handleDeleteCase}
+            onNavigateToChat={() => setActiveTab('chat')}
           />
         )}
 
         {activeTab === 'knowledge' && (
-          <KnowledgeLibrary onApplyCasePrompt={handleApplyCasePromptFromLibrary} />
+          <KnowledgeLibrary
+            onApplyStrategy={(prompt) => {
+              setActiveTab('chat');
+              handleSendMessage(prompt);
+            }}
+          />
         )}
       </main>
 
-      {/* Mobile Bottom Navigation Bar (Stitch Mobile Spec) */}
+      {/* Navegación Móvil Inferior */}
       <BottomNav
         activeTab={activeTab}
         onTabChange={setActiveTab}
         activePrescriptionsCount={activePrescriptionsCount}
       />
 
-      {/* Settings Modal */}
+      {/* Modal de Configuración */}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
-        onSaveSettings={handleSaveSettings}
-        onDataImported={handleDataImported}
+        onSaveSettings={(newSettings) => {
+          setSettings(newSettings);
+          StorageManager.saveSettings(newSettings);
+        }}
+        onDataImported={() => {
+          setCases(StorageManager.getCases());
+          setActiveCaseId(StorageManager.getActiveCaseId());
+        }}
       />
     </div>
   );

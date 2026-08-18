@@ -47,7 +47,7 @@ export const KnowledgeLibrary: React.FC<KnowledgeLibraryProps> = ({ onApplyCaseP
               onClick={() => setSelectedCategory(cat)}
               className={`whitespace-nowrap px-4 py-2 rounded-2xl font-label-md text-xs font-semibold capitalize transition-all ${
                 selectedCategory === cat
-                  ? 'bg-primary-container text-on-primary-container shadow-soft border border-transparent'
+                  ? 'bg-primary text-white font-bold shadow-soft border border-transparent'
                   : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border border-outline-variant/30'
               }`}
             >

@@ -76,7 +76,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `breveapp_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `pragmapp_backup_${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -98,13 +98,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-surface/40 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-surface/40 backdrop-blur-sm">
       <div className="bg-surface-container-lowest w-full max-w-xl rounded-3xl shadow-xl border border-surface-container-highest overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header del Modal */}
         <div className="px-6 py-4 border-b border-surface-container-highest flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <h3 className="font-heading font-bold text-lg text-on-surface">Configuración de BreveApp</h3>
+            <h3 className="font-heading font-bold text-lg text-on-surface">Configuración de Pragmapp</h3>
           </div>
           <button
             onClick={onClose}

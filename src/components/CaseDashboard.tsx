@@ -217,7 +217,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
           onClick={() => setActiveSubTab('pautas')}
           className={`flex-shrink-0 px-4 py-2 rounded-full font-label-md text-xs font-semibold transition-colors ${
             activeSubTab === 'pautas'
-              ? 'bg-primary-container text-on-primary-container shadow-xs'
+              ? 'bg-primary text-white font-bold shadow-xs'
               : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
           }`}
         >
@@ -227,7 +227,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
           onClick={() => setActiveSubTab('soluciones')}
           className={`flex-shrink-0 px-4 py-2 rounded-full font-label-md text-xs font-semibold transition-colors ${
             activeSubTab === 'soluciones'
-              ? 'bg-primary-container text-on-primary-container shadow-xs'
+              ? 'bg-primary text-white font-bold shadow-xs'
               : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
           }`}
         >
@@ -237,7 +237,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
           onClick={() => setActiveSubTab('notas')}
           className={`flex-shrink-0 px-4 py-2 rounded-full font-label-md text-xs font-semibold transition-colors ${
             activeSubTab === 'notas'
-              ? 'bg-primary-container text-on-primary-container shadow-xs'
+              ? 'bg-primary text-white font-bold shadow-xs'
               : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
           }`}
         >

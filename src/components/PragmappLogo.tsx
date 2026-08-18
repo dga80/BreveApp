@@ -29,7 +29,7 @@ export const PragmappLogo: React.FC<PragmappLogoProps> = ({
 
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
-      {/* Isotipo Pragmapp (Vector Fiel a la Imagen) */}
+      {/* Isotipo Pragmapp */}
       <svg
         className={`${iconSizes[size]} shrink-0`}
         viewBox="0 0 100 100"

@@ -45,7 +45,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
         </div>
 
         <div className="pt-6 flex items-center space-x-1.5">
-          <span className="w-2 h-2 bg-primary rounded-full animate-ping"></span>
+          <span className="w-2.5 h-2.5 bg-primary rounded-full animate-ping"></span>
         </div>
       </div>
 
