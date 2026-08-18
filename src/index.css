@@ -4,19 +4,35 @@
 
 @layer base {
   body {
-    @apply bg-stone-50 text-stone-800 selection:bg-teal-100 selection:text-teal-900;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    @apply bg-surface text-on-surface selection:bg-primary-fixed-dim selection:text-primary;
+    font-family: 'Inter', sans-serif;
   }
 
-  h1, h2, h3, .font-serif {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+  h1, h2, h3, h4, .font-heading {
+    font-family: 'Outfit', sans-serif;
   }
+}
+
+/* Material Symbols Icon helper */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Custom subtle scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {

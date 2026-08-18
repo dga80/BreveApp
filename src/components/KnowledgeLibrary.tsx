@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Search, Sparkles, CheckCircle, ArrowRight, Lightbulb } from 'lucide-react';
+import { BookOpen, Search, Sparkles, ArrowRight, Lightbulb, CheckCircle2 } from 'lucide-react';
 import { MARIBEL_PRINCIPLES, KNOWLEDGE_CASES } from '../lib/knowledgeBase';
 
 interface KnowledgeLibraryProps {
@@ -23,54 +23,54 @@ export const KnowledgeLibrary: React.FC<KnowledgeLibraryProps> = ({ onApplyCaseP
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-8">
+    <div className="max-w-5xl mx-auto px-3 sm:px-6 py-5 space-y-6 bg-surface">
       
-      {/* Introducción y principios de Maribel Martínez */}
-      <div className="bg-gradient-to-r from-teal-800 to-emerald-900 text-white rounded-3xl p-6 sm:p-8 shadow-md">
-        <div className="flex items-center space-x-2 text-teal-300 text-xs font-bold uppercase tracking-wider mb-2">
-          <Sparkles className="w-4 h-4" />
-          <span>Metodología & Escuela de Maribel Martínez</span>
+      {/* Banner Principal - Metodología Maribel Martínez (Estilo Stitch) */}
+      <div className="bg-primary text-white rounded-3xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
+        <div className="flex items-center space-x-2 text-stitch-lightMint text-xs font-bold uppercase tracking-wider mb-2">
+          <Sparkles className="w-4 h-4 text-stitch-lightMint" />
+          <span>Biblioteca Clínica & Metodología Maribel Martínez</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-          Principios de la Terapia Breve Estratégica en Familia
+        <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight mb-3">
+          Principios de la Terapia Breve Estratégica
         </h2>
-        <p className="text-sm text-teal-100 max-w-3xl leading-relaxed">
-          La Terapia Breve Estratégica no busca las causas en el pasado lejano, sino cómo se mantiene el problema en el presente mediante las <strong>soluciones intentadas</strong> de los padres.
+        <p className="text-sm text-white/90 max-w-3xl leading-relaxed">
+          La Terapia Breve Estratégica no busca culpa en el pasado, sino identificar cómo se mantiene el problema en el presente mediante las <strong>soluciones intentadas</strong> erróneas de los padres.
         </p>
 
-        {/* Tarjetas de principios */}
+        {/* Tarjetas de Principios Fundamentales */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
           {MARIBEL_PRINCIPLES.slice(0, 3).map((principle, idx) => (
-            <div key={idx} className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-              <h3 className="text-sm font-bold text-white mb-1.5">{principle.title}</h3>
-              <p className="text-xs text-teal-100/90 leading-relaxed">{principle.text}</p>
+            <div key={idx} className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15">
+              <h3 className="font-heading text-sm font-bold text-white mb-1.5">{principle.title}</h3>
+              <p className="text-xs text-white/80 leading-relaxed">{principle.text}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Buscador y Filtros */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* Buscador y Pastillas de Filtro */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 absolute left-3 top-3 text-stone-400" />
+          <Search className="w-4 h-4 absolute left-3.5 top-3 text-on-surface-variant/50" />
           <input
             type="text"
-            placeholder="Buscar por pantallas, rabietas, miedos..."
+            placeholder="Buscar casos por pantallas, rabietas, miedos..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-white border border-stone-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-2xs"
+            className="w-full pl-9 pr-4 py-2.5 bg-surface-container-lowest border border-surface-container-highest rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-2xs text-on-surface placeholder-on-surface-variant/50"
           />
         </div>
 
-        <div className="flex gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 text-xs">
+        <div className="flex gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 text-xs no-scrollbar">
           {['all', 'pantallas', 'rabietas', 'estudio', 'rutinas', 'miedos'].map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-lg font-semibold capitalize transition-all ${
+              className={`px-3 py-1.5 rounded-xl font-semibold capitalize transition-all ${
                 selectedCategory === cat
-                  ? 'bg-teal-600 text-white shadow-2xs'
-                  : 'bg-white text-stone-600 hover:bg-stone-100 border border-stone-200'
+                  ? 'bg-primary text-white shadow-2xs'
+                  : 'bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low border border-surface-container-highest'
               }`}
             >
               {cat === 'all' ? 'Todos los casos' : cat}
@@ -79,49 +79,49 @@ export const KnowledgeLibrary: React.FC<KnowledgeLibraryProps> = ({ onApplyCaseP
         </div>
       </div>
 
-      {/* Casos clínicos y pautas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Grid de Casos Clínicos Tipo */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {filteredCases.map((item) => (
           <div
             key={item.id}
-            className="bg-white border border-stone-200 rounded-2xl p-5 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between"
+            className="bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-5 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg bg-primary/10 text-primary border border-primary/20">
                   {item.category}
                 </span>
-                <span className="text-[11px] text-stone-400">{item.source}</span>
+                <span className="text-[11px] text-on-surface-variant/70">{item.source}</span>
               </div>
 
-              <h3 className="font-bold text-stone-900 text-sm mb-3">{item.title}</h3>
+              <h3 className="font-heading font-bold text-on-surface text-base mb-3">{item.title}</h3>
 
               <div className="space-y-3 text-xs">
-                <div className="bg-stone-50 p-2.5 rounded-lg border border-stone-100">
-                  <span className="font-semibold text-stone-800 block mb-0.5">⚠️ Error común (solución que falla):</span>
-                  <p className="text-stone-600">{item.attemptedSolutionFailed}</p>
+                <div className="bg-tertiary-container/10 p-3 rounded-xl border border-tertiary-container/20">
+                  <span className="font-semibold text-tertiary-container block mb-0.5">⚠️ Error común (Solución intentada fallida):</span>
+                  <p className="text-on-surface-variant">{item.attemptedSolutionFailed}</p>
                 </div>
 
-                <div className="bg-teal-50/60 p-2.5 rounded-lg border border-teal-100">
-                  <span className="font-semibold text-teal-900 block mb-0.5">🎯 Pauta Estratégica:</span>
-                  <p className="text-teal-950">{item.prescription}</p>
+                <div className="bg-primary/5 p-3 rounded-xl border border-primary/20">
+                  <span className="font-semibold text-primary block mb-0.5">🎯 Pauta Estratégica:</span>
+                  <p className="text-on-surface">{item.prescription}</p>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-stone-500 italic pt-1">
+                <div className="flex items-center gap-1.5 text-on-surface-variant/80 italic pt-1">
                   <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                   <span>Regla de oro: {item.keyRule}</span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-stone-100 flex justify-end">
+            <div className="mt-4 pt-3 border-t border-surface-container-highest flex justify-end">
               <button
                 onClick={() =>
                   onApplyCasePrompt(
                     `Quiero consultar cómo aplicar la pauta estratégica para: "${item.title}". En nuestro caso ocurre lo siguiente: `
                   )
                 }
-                className="text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1 hover:underline"
+                className="text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-1 hover:underline"
               >
                 <span>Consultar caso en el chat</span>
                 <ArrowRight className="w-3.5 h-3.5" />
