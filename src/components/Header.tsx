@@ -138,54 +138,6 @@ export const Header: React.FC<HeaderProps> = ({
 
         </div>
 
-        {/* Fila Móvil Secundaria: Barra de Pestañas Flotante Móvil */}
-        <div className="md:hidden pb-2 pt-0.5">
-          <nav className="grid grid-cols-3 gap-1 bg-surface-container-low p-1 rounded-xl border border-surface-container-highest text-xs font-semibold">
-            <button
-              onClick={() => onTabChange('chat')}
-              className={`py-1.5 rounded-lg flex items-center justify-center space-x-1.5 transition-all ${
-                activeTab === 'chat'
-                  ? 'bg-primary text-white font-bold shadow-xs'
-                  : 'text-primary hover:bg-surface-container-lowest'
-              }`}
-            >
-              <MessageSquare className={`w-3.5 h-3.5 ${activeTab === 'chat' ? 'text-white' : 'text-primary'}`} />
-              <span>Consulta</span>
-            </button>
-
-            <button
-              onClick={() => onTabChange('dashboard')}
-              className={`py-1.5 rounded-lg flex items-center justify-center space-x-1.5 transition-all ${
-                activeTab === 'dashboard'
-                  ? 'bg-primary text-white font-bold shadow-xs'
-                  : 'text-primary hover:bg-surface-container-lowest'
-              }`}
-            >
-              <FolderHeart className={`w-3.5 h-3.5 ${activeTab === 'dashboard' ? 'text-white' : 'text-primary'}`} />
-              <span>Ficha</span>
-              {activePrescriptionsCount > 0 && (
-                <span className={`rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold ${
-                  activeTab === 'dashboard' ? 'bg-white text-primary' : 'bg-primary text-white'
-                }`}>
-                  {activePrescriptionsCount}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => onTabChange('knowledge')}
-              className={`py-1.5 rounded-lg flex items-center justify-center space-x-1.5 transition-all ${
-                activeTab === 'knowledge'
-                  ? 'bg-primary text-white font-bold shadow-xs'
-                  : 'text-primary hover:bg-surface-container-lowest'
-              }`}
-            >
-              <BookOpen className={`w-3.5 h-3.5 ${activeTab === 'knowledge' ? 'text-white' : 'text-primary'}`} />
-              <span>Biblioteca</span>
-            </button>
-          </nav>
-        </div>
-
       </div>
     </header>
   );

@@ -233,34 +233,34 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
         </div>
       )}
 
-      {/* Barra de Pestañas de la Ficha */}
-      <nav className="flex gap-2 overflow-x-auto pb-1 no-scrollbar border-b border-outline-variant/20">
+      {/* Barra de Pestañas de la Ficha (Grid de 3 columnas sin scroll lateral) */}
+      <nav className="grid grid-cols-3 gap-1.5 border-b border-outline-variant/20 pb-2">
         <button
           onClick={() => setActiveSubTab('pautas')}
-          className={`flex-shrink-0 px-4 py-2 rounded-full font-label-md text-xs font-semibold transition-colors ${
+          className={`py-2 px-1 text-center rounded-xl text-[11px] font-bold transition-all leading-tight ${
             activeSubTab === 'pautas'
-              ? 'bg-primary text-white font-bold shadow-xs'
-              : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+              ? 'bg-primary text-white shadow-xs'
+              : 'bg-surface-container-low text-primary hover:bg-surface-container'
           }`}
         >
-          Pautas Activas ({activeRxs.length})
+          Pautas ({activeRxs.length})
         </button>
         <button
           onClick={() => setActiveSubTab('soluciones')}
-          className={`flex-shrink-0 px-4 py-2 rounded-full font-label-md text-xs font-semibold transition-colors ${
+          className={`py-2 px-1 text-center rounded-xl text-[11px] font-bold transition-all leading-tight ${
             activeSubTab === 'soluciones'
-              ? 'bg-primary text-white font-bold shadow-xs'
-              : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+              ? 'bg-primary text-white shadow-xs'
+              : 'bg-surface-container-low text-primary hover:bg-surface-container'
           }`}
         >
-          Soluciones Intentadas ({(activeCase.attemptedSolutions || []).length})
+          Soluciones ({(activeCase.attemptedSolutions || []).length})
         </button>
         <button
           onClick={() => setActiveSubTab('notas')}
-          className={`flex-shrink-0 px-4 py-2 rounded-full font-label-md text-xs font-semibold transition-colors ${
+          className={`py-2 px-1 text-center rounded-xl text-[11px] font-bold transition-all leading-tight ${
             activeSubTab === 'notas'
-              ? 'bg-primary text-white font-bold shadow-xs'
-              : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+              ? 'bg-primary text-white shadow-xs'
+              : 'bg-surface-container-low text-primary hover:bg-surface-container'
           }`}
         >
           Evolución ({(activeCase.notes || []).length})

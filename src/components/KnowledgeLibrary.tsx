@@ -39,16 +39,16 @@ export const KnowledgeLibrary: React.FC<KnowledgeLibraryProps> = ({ onApplyCaseP
           />
         </div>
 
-        {/* Pastillas de filtro */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide justify-start md:justify-center">
+        {/* Pastillas de filtro (Adaptadas sin scroll lateral) */}
+        <div className="flex flex-wrap gap-1.5 justify-center">
           {['all', 'pantallas', 'rabietas', 'estudio', 'rutinas', 'miedos'].map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`whitespace-nowrap px-4 py-2 rounded-2xl font-label-md text-xs font-semibold capitalize transition-all ${
+              className={`px-3 py-1.5 rounded-xl font-label-md text-xs font-semibold capitalize transition-all ${
                 selectedCategory === cat
-                  ? 'bg-primary text-white font-bold shadow-soft border border-transparent'
-                  : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border border-outline-variant/30'
+                  ? 'bg-primary text-white font-bold shadow-xs border border-transparent'
+                  : 'bg-surface-container-low text-primary hover:bg-surface-container border border-outline-variant/30'
               }`}
             >
               {cat === 'all' ? 'Todos los Casos' : cat}
