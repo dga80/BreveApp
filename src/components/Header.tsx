@@ -34,23 +34,23 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         
         {/* Fila Principal */}
-        <div className="flex items-center justify-between h-14 sm:h-16">
+        <div className="flex items-center justify-between h-14 sm:h-16 gap-1">
           
-          {/* Marca Pragmapp (Sin icono superior izquierdo) */}
-          <div className="flex items-center space-x-2 shrink-0">
+          {/* Marca Pragmapp (Ligeramente reducida para no superponerse) */}
+          <div className="flex items-center shrink-0">
             <PragmappLogo size="md" showText={true} showIcon={false} />
           </div>
 
           {/* Fila Derecha: Historial, Selector de Caso y Ajustes */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2">
+          <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
             
             {/* Botón de Historial de Consultas */}
             <button
               onClick={onOpenHistory}
-              className="px-2.5 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-xl transition-all border border-primary/20 flex items-center gap-1.5 text-xs font-bold"
+              className="px-2 py-1 sm:px-2.5 sm:py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-xl transition-all border border-primary/20 flex items-center gap-1 text-[11px] sm:text-xs font-bold"
               title="Historial de consultas pasadas"
             >
-              <History className="w-4 h-4 text-primary" />
+              <History className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
               <span>Historial</span>
             </button>
 
@@ -59,7 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
               <select
                 value={activeCaseId}
                 onChange={(e) => onSelectCase(e.target.value)}
-                className="bg-transparent text-xs font-semibold text-primary py-0.5 px-1.5 focus:outline-none cursor-pointer max-w-[110px] xs:max-w-[140px] sm:max-w-[180px] truncate"
+                className="bg-transparent text-[11px] sm:text-xs font-semibold text-primary py-0.5 px-1 focus:outline-none cursor-pointer max-w-[85px] xs:max-w-[110px] sm:max-w-[180px] truncate"
               >
                 {cases.map((c) => (
                   <option key={c.id} value={c.id}>

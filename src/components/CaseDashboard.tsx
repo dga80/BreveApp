@@ -153,27 +153,27 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
   const completedRxs = (activeCase.prescriptions || []).filter((p) => p.completed);
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6 bg-background min-h-[calc(100vh-4rem)] pb-24">
+    <div className="w-full max-w-3xl mx-auto px-3 sm:px-4 py-6 space-y-6 bg-background min-h-[calc(100vh-4rem)] pb-24 overflow-x-hidden">
       
       {/* Sección del Perfil Infantil */}
-      <section className="bg-surface-container-lowest rounded-2xl p-5 shadow-[0_4px_20px_rgba(15,118,110,0.04)] flex items-center gap-4 relative overflow-hidden border border-outline-variant/20">
+      <section className="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(15,118,110,0.04)] flex items-center gap-3 sm:gap-4 relative overflow-hidden border border-outline-variant/20 w-full">
         <div className="absolute top-0 left-0 w-2 h-full bg-secondary"></div>
-        <div className="w-14 h-14 rounded-full overflow-hidden bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xl shrink-0 border-2 border-surface">
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-lg sm:text-xl shrink-0 border-2 border-surface">
           {activeCase.childName ? activeCase.childName[0].toUpperCase() : 'P'}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
-            <h1 className="font-headline-lg text-lg sm:text-xl font-bold text-on-surface font-display truncate">
+            <h1 className="font-headline-lg text-base sm:text-xl font-bold text-on-surface font-display truncate">
               {activeCase.childName || activeCase.title} {activeCase.childAge ? `, ${activeCase.childAge}` : ''}
             </h1>
             <button
               onClick={() => setIsEditingProfile(!isEditingProfile)}
-              className="text-xs text-outline hover:text-primary p-1"
+              className="text-xs text-outline hover:text-primary p-1 shrink-0"
             >
               <span className="material-symbols-outlined text-base">edit</span>
             </button>
           </div>
-          <p className="font-body-sm text-xs text-outline flex items-center gap-1 mt-0.5 truncate">
+          <p className="font-body-sm text-[11px] sm:text-xs text-outline flex items-center gap-1 mt-0.5 truncate">
             <span className="material-symbols-outlined text-sm">psychology</span> Foco: {activeCase.mainIssue || 'Consulta de Terapia Breve'}
           </p>
         </div>
@@ -181,7 +181,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
 
       {/* Formulario de Edición de Ficha */}
       {isEditingProfile && (
-        <div className="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/30 space-y-3 text-xs">
+        <div className="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/30 space-y-3 text-xs w-full">
           <div>
             <label className="font-semibold text-on-surface">Título del caso / Consulta:</label>
             <input
@@ -234,10 +234,10 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
       )}
 
       {/* Barra de Pestañas de la Ficha (Grid de 3 columnas sin scroll lateral) */}
-      <nav className="grid grid-cols-3 gap-1.5 border-b border-outline-variant/20 pb-2">
+      <nav className="grid grid-cols-3 gap-1.5 border-b border-outline-variant/20 pb-2 w-full">
         <button
           onClick={() => setActiveSubTab('pautas')}
-          className={`py-2 px-1 text-center rounded-xl text-[11px] font-bold transition-all leading-tight ${
+          className={`py-2 px-1 text-center rounded-xl text-[10px] sm:text-xs font-bold transition-all leading-tight truncate ${
             activeSubTab === 'pautas'
               ? 'bg-primary text-white shadow-xs'
               : 'bg-surface-container-low text-primary hover:bg-surface-container'
@@ -247,7 +247,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
         </button>
         <button
           onClick={() => setActiveSubTab('soluciones')}
-          className={`py-2 px-1 text-center rounded-xl text-[11px] font-bold transition-all leading-tight ${
+          className={`py-2 px-1 text-center rounded-xl text-[10px] sm:text-xs font-bold transition-all leading-tight truncate ${
             activeSubTab === 'soluciones'
               ? 'bg-primary text-white shadow-xs'
               : 'bg-surface-container-low text-primary hover:bg-surface-container'
@@ -257,7 +257,7 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
         </button>
         <button
           onClick={() => setActiveSubTab('notas')}
-          className={`py-2 px-1 text-center rounded-xl text-[11px] font-bold transition-all leading-tight ${
+          className={`py-2 px-1 text-center rounded-xl text-[10px] sm:text-xs font-bold transition-all leading-tight truncate ${
             activeSubTab === 'notas'
               ? 'bg-primary text-white shadow-xs'
               : 'bg-surface-container-low text-primary hover:bg-surface-container'
@@ -269,12 +269,12 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
 
       {/* Contenido Pautas */}
       {activeSubTab === 'pautas' && (
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-title-md text-sm font-bold text-on-surface">Pautas Conductuales Recomendadas</h3>
+        <section className="space-y-4 w-full">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="font-title-md text-xs sm:text-sm font-bold text-on-surface truncate">Pautas Recomendadas</h3>
             <button
               onClick={() => setShowAddRx(true)}
-              className="text-xs bg-primary/10 text-primary hover:bg-primary/20 font-bold px-3 py-1.5 rounded-xl border border-primary/20 flex items-center gap-1"
+              className="text-[11px] sm:text-xs bg-primary/10 text-primary hover:bg-primary/20 font-bold px-2.5 py-1.5 rounded-xl border border-primary/20 flex items-center gap-1 shrink-0"
             >
               <span className="material-symbols-outlined text-sm">add</span> Nueva Pauta
             </button>

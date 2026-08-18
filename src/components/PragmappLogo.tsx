@@ -16,21 +16,21 @@ export const PragmappLogo: React.FC<PragmappLogoProps> = ({
   textColor = 'text-on-surface'
 }) => {
   const iconSizes = {
-    sm: 'w-6 h-6',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
-    xl: 'w-20 h-20'
+    sm: 'w-5 h-5',
+    md: 'w-7 h-7',
+    lg: 'w-10 h-10',
+    xl: 'w-16 h-16'
   };
 
   const textSizes = {
-    sm: 'text-base font-bold',
-    md: 'text-xl font-bold',
-    lg: 'text-3xl font-bold',
-    xl: 'text-5xl font-bold'
+    sm: 'text-xs font-bold',
+    md: 'text-sm sm:text-base font-bold',
+    lg: 'text-xl font-bold',
+    xl: 'text-3xl font-bold'
   };
 
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
+    <div className={`flex items-center gap-1.5 ${className}`}>
       {/* Isotipo Pragmapp */}
       {showIcon && (
         <svg
