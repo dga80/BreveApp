@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { BookOpen, Search, Sparkles, ArrowRight, Lightbulb, CheckCircle2 } from 'lucide-react';
 import { MARIBEL_PRINCIPLES, KNOWLEDGE_CASES } from '../lib/knowledgeBase';
 
 interface KnowledgeLibraryProps {
@@ -23,113 +22,114 @@ export const KnowledgeLibrary: React.FC<KnowledgeLibraryProps> = ({ onApplyCaseP
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-3 sm:px-6 py-5 space-y-6 bg-surface">
+    <div className="max-w-7xl mx-auto px-4 py-6 space-y-8 bg-background min-h-[calc(100vh-4rem)] pb-24">
       
-      {/* Banner Principal - Metodología Maribel Martínez (Estilo Stitch) */}
-      <div className="bg-primary text-white rounded-3xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
-        <div className="flex items-center space-x-2 text-stitch-lightMint text-xs font-bold uppercase tracking-wider mb-2">
-          <Sparkles className="w-4 h-4 text-stitch-lightMint" />
-          <span>Biblioteca Clínica & Metodología Maribel Martínez</span>
-        </div>
-        <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-          Principios de la Terapia Breve Estratégica
-        </h2>
-        <p className="text-sm text-white/90 max-w-3xl leading-relaxed">
-          La Terapia Breve Estratégica no busca culpa en el pasado, sino identificar cómo se mantiene el problema en el presente mediante las <strong>soluciones intentadas</strong> erróneas de los padres.
-        </p>
-
-        {/* Tarjetas de Principios Fundamentales */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-          {MARIBEL_PRINCIPLES.slice(0, 3).map((principle, idx) => (
-            <div key={idx} className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15">
-              <h3 className="font-heading text-sm font-bold text-white mb-1.5">{principle.title}</h3>
-              <p className="text-xs text-white/80 leading-relaxed">{principle.text}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Buscador y Pastillas de Filtro */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 absolute left-3.5 top-3 text-on-surface-variant/50" />
+      {/* Sección de Búsqueda y Filtros estilo Stitch */}
+      <section className="mb-6">
+        <div className="relative w-full max-w-2xl mx-auto mb-6">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <span className="material-symbols-outlined text-outline">search</span>
+          </div>
           <input
             type="text"
-            placeholder="Buscar casos por pantallas, rabietas, miedos..."
+            placeholder="Buscar axiomas, casos o lecturas de TBE..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-surface-container-lowest border border-surface-container-highest rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-2xs text-on-surface placeholder-on-surface-variant/50"
+            className="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-2xl py-3 pl-12 pr-4 font-body-md text-sm text-on-surface placeholder:text-outline shadow-soft focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           />
         </div>
 
-        <div className="flex gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 text-xs no-scrollbar">
+        {/* Pastillas de filtro */}
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide justify-start md:justify-center">
           {['all', 'pantallas', 'rabietas', 'estudio', 'rutinas', 'miedos'].map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-xl font-semibold capitalize transition-all ${
+              className={`whitespace-nowrap px-4 py-2 rounded-2xl font-label-md text-xs font-semibold capitalize transition-all ${
                 selectedCategory === cat
-                  ? 'bg-primary text-white shadow-2xs'
-                  : 'bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low border border-surface-container-highest'
+                  ? 'bg-primary-container text-on-primary-container shadow-soft border border-transparent'
+                  : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border border-outline-variant/30'
               }`}
             >
-              {cat === 'all' ? 'Todos los casos' : cat}
+              {cat === 'all' ? 'Todos los Casos' : cat}
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Grid de Casos Clínicos Tipo */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {/* Bento Grid Layout para Items de la Biblioteca de Stitch */}
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        {/* Tarjeta Principal Destacada: Axiomas Clínicos */}
+        <article className="col-span-1 md:col-span-2 lg:col-span-2 bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/20 relative overflow-hidden group hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-tertiary-container flex flex-col justify-between min-h-[220px]">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <span className="material-symbols-outlined text-7xl text-tertiary-container">psychology</span>
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="material-symbols-outlined text-tertiary-container text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>psychology</span>
+              <span className="font-label-md text-xs font-bold text-tertiary-container uppercase tracking-wider">Axiomas Clínicos & Metodología</span>
+            </div>
+            <h2 className="font-headline-lg text-xl sm:text-2xl font-bold text-on-surface mb-2 font-display">Fundamentos de Intervención Breve</h2>
+            <p className="font-body-sm text-xs sm:text-sm text-on-surface-variant max-w-xl leading-relaxed">
+              Principios rectores de Maribel Martínez y la escuela de Terapia Breve Estratégica, enfocados en la resolución de problemas en el presente e interrupción de soluciones intentadas ineficaces.
+            </p>
+          </div>
+          <div className="flex justify-between items-end mt-4 pt-3 border-t border-outline-variant/20">
+            <span className="font-label-sm text-xs text-outline font-medium">12 Documentos Clínicos</span>
+            <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
+              <span className="material-symbols-outlined text-base">arrow_forward</span>
+            </div>
+          </div>
+        </article>
+
+        {/* Tarjetas de Casos Tipo */}
         {filteredCases.map((item) => (
-          <div
+          <article
             key={item.id}
-            className="bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-5 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between"
+            className="bg-surface-container-lowest rounded-2xl p-5 shadow-soft border border-outline-variant/20 flex flex-col hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-secondary justify-between"
           >
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg bg-primary/10 text-primary border border-primary/20">
-                  {item.category}
-                </span>
-                <span className="text-[11px] text-on-surface-variant/70">{item.source}</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-secondary text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>analytics</span>
+                  <span className="font-label-sm text-[11px] font-bold text-secondary uppercase tracking-wider">{item.category}</span>
+                </div>
+                <span className="font-label-sm text-[10px] text-outline">{item.source}</span>
               </div>
 
-              <h3 className="font-heading font-bold text-on-surface text-base mb-3">{item.title}</h3>
-
-              <div className="space-y-3 text-xs">
-                <div className="bg-tertiary-container/10 p-3 rounded-xl border border-tertiary-container/20">
-                  <span className="font-semibold text-tertiary-container block mb-0.5">⚠️ Error común (Solución intentada fallida):</span>
-                  <p className="text-on-surface-variant">{item.attemptedSolutionFailed}</p>
-                </div>
-
-                <div className="bg-primary/5 p-3 rounded-xl border border-primary/20">
-                  <span className="font-semibold text-primary block mb-0.5">🎯 Pauta Estratégica:</span>
-                  <p className="text-on-surface">{item.prescription}</p>
-                </div>
-
-                <div className="flex items-center gap-1.5 text-on-surface-variant/80 italic pt-1">
-                  <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  <span>Regla de oro: {item.keyRule}</span>
-                </div>
+              <h3 className="font-headline-md text-base font-bold text-on-surface mb-2 font-display">{item.title}</h3>
+              
+              <div className="space-y-2.5 text-xs text-on-surface-variant mb-4">
+                <p className="bg-surface-container-low p-2.5 rounded-xl border border-outline-variant/20">
+                  <strong className="text-tertiary block mb-0.5">⚠️ Error común (Solución fallida):</strong>
+                  {item.attemptedSolutionFailed}
+                </p>
+                <p className="bg-primary-container/10 p-2.5 rounded-xl border border-primary/20 text-on-surface">
+                  <strong className="text-primary block mb-0.5">🎯 Pauta Estratégica:</strong>
+                  {item.prescription}
+                </p>
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-surface-container-highest flex justify-end">
+            <div className="flex justify-between items-center pt-3 border-t border-outline-variant/20">
+              <span className="font-label-sm text-[11px] text-outline italic">Regla: {item.keyRule}</span>
               <button
                 onClick={() =>
                   onApplyCasePrompt(
                     `Quiero consultar cómo aplicar la pauta estratégica para: "${item.title}". En nuestro caso ocurre lo siguiente: `
                   )
                 }
-                className="text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-1 hover:underline"
+                className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center hover:bg-primary hover:text-white transition-colors shrink-0"
+                title="Consultar en el chat"
               >
-                <span>Consultar caso en el chat</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span className="material-symbols-outlined text-base">forum</span>
               </button>
             </div>
-          </div>
+          </article>
         ))}
-      </div>
+
+      </section>
 
     </div>
   );

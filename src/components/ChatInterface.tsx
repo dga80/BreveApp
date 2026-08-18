@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Send, Sparkles, User, HelpCircle, CheckCircle, Globe, BookmarkPlus, Sparkle } from 'lucide-react';
 import { Message, CaseProfile, Prescription } from '../types';
 
 interface ChatInterfaceProps {
@@ -13,11 +12,11 @@ interface ChatInterfaceProps {
 }
 
 const QUICK_TOPICS = [
-  { label: '📱 Apagar pantallas sin drama', prompt: 'Tenemos una batalla constante cada vez que hay que apagar la tablet o los videojuegos. Cuando le aviso se enfada y monta un escándalo. ¿Qué pauta estratégica nos recomiendas?' },
-  { label: '💥 Rabietas al decirle que no', prompt: 'Cuando le negamos un capricho o le ponemos un límite, estalla en una rabieta monumental y no sabemos cómo pararla sin acabar gritando o cediendo.' },
-  { label: '📚 Batalla diaria con los deberes', prompt: 'Tardamos horas en hacer las tareas escolares. Si no estoy sentada encima de él no hace nada y se distrae constantemente.' },
-  { label: '🛏️ Problemas para dormir solo', prompt: 'A la hora de dormir busca cualquier excusa (sed, miedo, otro cuento) y a mitad de la noche acaba metiéndose en nuestra cama.' },
-  { label: '🔄 ¿Qué son las "Soluciones Intentadas"?', prompt: 'Explícame qué son las "soluciones intentadas" en Terapia Breve Estratégica y cómo podemos identificar si lo que estamos haciendo empeora el problema.' }
+  { label: 'Rabietas y límites', prompt: 'Tenemos una batalla constante cada vez que hay que poner un límite o apagar la pantalla. Cuando le aviso se enfada y monta un escándalo. ¿Qué pauta estratégica nos recomiendas?' },
+  { label: 'Uso de pantallas', prompt: 'Dificultad para apagar la tablet o videojuegos al terminar el tiempo pactado y constantes quejas para vestirse o ir a cenar.' },
+  { label: 'Miedos e inseguridad', prompt: 'A la hora de dormir busca excusas por miedo a quedarse solo en su habitación y acaba viniendo a nuestra cama.' },
+  { label: 'Estudios', prompt: 'Tardamos horas en hacer los deberes. Si no estoy sentada a su lado constantemente no trabaja.' },
+  { label: 'Desobediencia', prompt: 'Ignora las instrucciones a la primera y solo reacciona cuando alzamos la voz o amenazamos con castigos.' }
 ];
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -28,6 +27,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   onAddPrescription
 }) => {
   const [input, setInput] = useState('');
+  const [activeChip, setActiveChip] = useState<string>('Rabietas y límites');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -55,88 +55,53 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] max-w-4xl mx-auto px-3 sm:px-6 py-3 bg-surface">
+    <div className="flex flex-col h-[calc(100vh-4rem)] max-w-3xl mx-auto w-full bg-background text-on-background relative">
       
-      {/* Banner de Caso Activo - Estilo Stitch */}
-      {activeCase && (
-        <div className="bg-surface-container-lowest border border-surface-container-highest rounded-2xl px-4 py-3 mb-3 flex items-center justify-between shadow-xs">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-sm">
-              {activeCase.childName ? activeCase.childName[0].toUpperCase() : 'C'}
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <h3 className="font-heading font-semibold text-sm text-on-surface">{activeCase.title}</h3>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary mr-1 animate-pulse"></span>
-                  Caso Activo
-                </span>
-              </div>
-              <p className="text-xs text-on-surface-variant line-clamp-1">
-                {activeCase.childAge ? `${activeCase.childAge} • ` : ''}{activeCase.mainIssue}
-              </p>
-            </div>
-          </div>
-          {activeCase.prescriptions && activeCase.prescriptions.length > 0 && (
-            <div className="hidden sm:flex items-center text-xs text-primary font-medium bg-primary/5 px-2.5 py-1 rounded-lg border border-primary/10">
-              <CheckCircle className="w-3.5 h-3.5 mr-1 text-primary" />
-              {activeCase.prescriptions.filter(p => !p.completed).length} pautas activas
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Sugerencias Rápidas en la parte superior (Scroll horizontal de pastillas) */}
-      <div className="mb-3">
-        <div className="flex items-center space-x-1.5 text-xs text-on-surface-variant mb-2">
-          <Sparkle className="w-3.5 h-3.5 text-primary" />
-          <span className="font-medium text-xs">Consultas estratégicas frecuentes:</span>
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-          {QUICK_TOPICS.map((topic, idx) => (
-            <button
-              key={idx}
-              onClick={() => {
-                setInput(topic.prompt);
-                inputRef.current?.focus();
-              }}
-              className="text-xs bg-surface-container-lowest hover:bg-primary/5 border border-surface-container-highest hover:border-primary/30 text-on-surface-variant hover:text-primary rounded-full px-3 py-1.5 whitespace-nowrap transition-all shadow-2xs font-medium"
-            >
-              {topic.label}
-            </button>
-          ))}
+      {/* Pastillas horizontales deslizables de Stitch */}
+      <div className="w-full overflow-x-auto hide-scrollbar py-2.5 px-4 border-b border-outline-variant/30 shrink-0 bg-surface/80 backdrop-blur-sm sticky top-0 z-20">
+        <div className="flex gap-2 w-max">
+          {QUICK_TOPICS.map((topic, idx) => {
+            const isActive = activeChip === topic.label;
+            return (
+              <button
+                key={idx}
+                onClick={() => {
+                  setActiveChip(topic.label);
+                  setInput(topic.prompt);
+                  inputRef.current?.focus();
+                }}
+                className={`px-4 py-2 rounded-full font-label-md text-xs whitespace-nowrap transition-transform active:scale-95 ${
+                  isActive
+                    ? 'bg-primary-container text-on-primary-container font-semibold shadow-sm'
+                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high border border-outline-variant/50'
+                }`}
+              >
+                {topic.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Área de Mensajes con Scroll */}
-      <div className="flex-1 overflow-y-auto space-y-4 pr-1 pb-4">
+      {/* Área de flujo de chat */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-6 pb-28 md:pb-24">
         {messages.map((message) => {
           const isUser = message.role === 'user';
           return (
             <div
               key={message.id}
-              className={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
+              className={`flex flex-col gap-1 max-w-[88%] sm:max-w-[85%] ${
+                isUser ? 'self-end' : 'self-start'
+              }`}
             >
-              {/* Avatar del usuario o terapeuta */}
+              {/* Burbuja de mensaje */}
               <div
-                className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold shadow-xs ${
+                className={`p-4 rounded-2xl text-sm leading-relaxed ${
                   isUser
-                    ? 'bg-on-surface text-surface'
-                    : 'bg-primary-container text-on-primary-container'
+                    ? 'bg-primary text-on-primary rounded-tr-xs shadow-[0_4px_12px_rgba(15,118,110,0.15)] font-body-md'
+                    : 'bg-surface-container-low text-on-surface rounded-tl-xs shadow-[0_2px_10px_rgba(15,118,110,0.03)] border border-white/50 font-body-md'
                 }`}
               >
-                {isUser ? <User className="w-4 h-4" /> : <Sparkles className="w-4 h-4 text-stitch-lightMint" />}
-              </div>
-
-              {/* Contenedor del mensaje */}
-              <div
-                className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-4 text-sm ${
-                  isUser
-                    ? 'bg-primary text-white rounded-tr-xs shadow-xs'
-                    : 'bg-surface-container-lowest text-on-surface border border-surface-container-highest rounded-tl-xs shadow-xs'
-                }`}
-              >
-                {/* Renderizado Markdown */}
                 <div className={`prose prose-sm max-w-none ${isUser ? 'prose-invert text-white' : 'text-on-surface'}`}>
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
@@ -145,13 +110,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
                       ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
                       strong: ({ children }) => (
-                        <strong className={`font-semibold ${isUser ? 'text-stitch-lightMint' : 'text-primary-container'}`}>
+                        <strong className={`font-semibold ${isUser ? 'text-on-primary-container' : 'text-primary'}`}>
                           {children}
                         </strong>
                       ),
                       blockquote: ({ children }) => (
                         <blockquote className={`border-l-3 pl-3 my-2 italic ${
-                          isUser ? 'border-stitch-lightMint text-stitch-lightMint/90' : 'border-primary text-on-surface-variant'
+                          isUser ? 'border-on-primary-container text-on-primary-container/90' : 'border-primary text-on-surface-variant'
                         }`}>
                           {children}
                         </blockquote>
@@ -162,74 +127,66 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   </ReactMarkdown>
                 </div>
 
-                {/* Fuentes Grounding de Google */}
+                {/* Fuentes consultadas */}
                 {message.sources && message.sources.length > 0 && (
-                  <div className="mt-3 pt-2 border-t border-surface-container-highest text-[11px] text-on-surface-variant flex items-center gap-1.5 flex-wrap">
-                    <Globe className="w-3.5 h-3.5 text-primary" />
-                    <span className="font-medium">Fuentes clínicas consultadas:</span>
+                  <div className="mt-3 pt-2 border-t border-outline-variant/20 text-[11px] text-on-surface-variant flex items-center gap-1.5 flex-wrap">
+                    <span className="material-symbols-outlined text-sm text-primary">public</span>
+                    <span className="font-medium">Fuentes clínicas:</span>
                     {message.sources.map((s, idx) => (
-                      <span key={idx} className="bg-surface-container-low px-1.5 py-0.5 rounded text-on-surface">
+                      <span key={idx} className="bg-surface-container px-2 py-0.5 rounded text-on-surface">
                         {s}
                       </span>
                     ))}
                   </div>
                 )}
+              </div>
 
-                {/* Prescripciones auto-detectadas */}
-                {message.prescriptions && message.prescriptions.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-primary/20 bg-primary/5 p-3 rounded-xl">
-                    <div className="flex items-center justify-between text-xs font-semibold text-primary mb-2">
-                      <span className="flex items-center gap-1.5">
-                        <CheckCircle className="w-4 h-4 text-primary" />
-                        🎯 Pauta Estratégica Prescrita
-                      </span>
+              {/* Tarjeta de Prescripción Destacada de Stitch si se detecta */}
+              {!isUser && message.prescriptions && message.prescriptions.length > 0 && (
+                <div className="bg-surface-container-lowest rounded-3xl shadow-[0_8px_30px_rgba(15,118,110,0.08)] border border-outline-variant/20 overflow-hidden my-3 relative w-full">
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-tertiary-container"></div>
+                  <div className="p-5 pl-6 flex flex-col gap-4 relative z-10">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-tertiary-container text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>target</span>
+                      <h2 className="font-headline-md text-headline-md text-on-surface font-display font-semibold">
+                        Pauta estratégica recomendada
+                      </h2>
                     </div>
+
                     {message.prescriptions.map((rx) => (
-                      <div key={rx.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-on-surface bg-surface-container-lowest p-2.5 rounded-xl border border-primary/20">
-                        <div>
-                          <span className="font-semibold text-primary block">{rx.title}</span>
-                          <span className="text-[11px] text-on-surface-variant line-clamp-1">{rx.description}</span>
-                        </div>
+                      <div key={rx.id} className="flex flex-col gap-3">
+                        <p className="font-body-sm text-body-sm text-on-surface font-medium">{rx.title}</p>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant">{rx.description}</p>
+                        
                         <button
                           onClick={() => onAddPrescription(rx)}
-                          className="px-3 py-1.5 bg-primary hover:bg-primary/90 text-white rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 shrink-0 mt-1 sm:mt-0"
+                          className="mt-1 w-full bg-primary-container text-on-primary-container font-label-md text-xs py-3 px-5 rounded-2xl flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-colors active:scale-[0.98] shadow-sm font-semibold"
                         >
-                          <BookmarkPlus className="w-3.5 h-3.5" />
-                          Guardar en Ficha
+                          <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>bookmark</span>
+                          Guardar en Ficha del Caso
                         </button>
                       </div>
                     ))}
                   </div>
-                )}
-
-                <div
-                  className={`text-[10px] mt-1.5 text-right ${
-                    isUser ? 'text-stitch-lightMint/80' : 'text-on-surface-variant/70'
-                  }`}
-                >
-                  {new Date(message.timestamp).toLocaleTimeString('es-ES', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
                 </div>
-              </div>
+              )}
+
+              <span className={`font-label-sm text-[10px] text-on-surface-variant ${isUser ? 'mr-2 self-end' : 'ml-2 self-start'}`}>
+                {new Date(message.timestamp).toLocaleTimeString('es-ES', {
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </span>
             </div>
           );
         })}
 
-        {/* Indicador de carga estilo Stitch */}
+        {/* Carga estilo Stitch */}
         {isLoading && (
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shadow-xs">
-              <Sparkles className="w-4 h-4 animate-spin text-stitch-lightMint" />
-            </div>
-            <div className="bg-surface-container-lowest border border-surface-container-highest rounded-2xl rounded-tl-xs p-4 shadow-xs">
-              <div className="flex items-center space-x-2 text-xs text-on-surface-variant">
-                <span className="w-2 h-2 bg-primary rounded-full animate-bounce"></span>
-                <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.2s]"></span>
-                <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.4s]"></span>
-                <span className="ml-2 font-medium text-on-surface">Analizando dinámica familiar y preparando prescripción...</span>
-              </div>
+          <div className="flex flex-col gap-1 max-w-[85%] self-start">
+            <div className="bg-surface-container-low text-on-surface p-4 rounded-2xl rounded-tl-sm shadow-[0_2px_10px_rgba(15,118,110,0.03)] border border-white/50 flex items-center gap-3">
+              <span className="material-symbols-outlined text-primary text-xl animate-spin">sync</span>
+              <span className="font-body-sm text-xs text-on-surface-variant">Analizando caso y preparando prescripción conductual...</span>
             </div>
           </div>
         )}
@@ -237,42 +194,32 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Entrada de texto flotante */}
-      <form onSubmit={handleSubmit} className="relative bg-surface-container-lowest border border-surface-container-highest rounded-2xl shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-        <textarea
-          ref={inputRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Describe la situación actual de tu hijo/a o qué dudas tienes (ej: 'No quiere apagar la tablet y montamos una batalla')..."
-          rows={2}
-          className="w-full bg-transparent px-4 pt-3 pb-10 text-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none resize-none"
-        />
-
-        <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between">
-          <span className="text-[11px] text-on-surface-variant/70 hidden sm:inline">
-            Presiona <kbd className="bg-surface-container-low border border-surface-container-highest rounded px-1 text-[10px]">Enter</kbd> para enviar
-          </span>
+      {/* Caja de entrada flotante al pie (Stitch Bottom Input Area) */}
+      <div className="fixed bottom-14 md:bottom-2 w-full max-w-3xl left-1/2 -translate-x-1/2 bg-surface/90 backdrop-blur-xl border-t border-outline-variant/20 p-2 z-40 px-3">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2 bg-surface-container-lowest rounded-3xl p-1.5 shadow-[0_-2px_15px_rgba(0,0,0,0.03)] border border-outline-variant/30">
+          <textarea
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Escribe tu consulta a Maribel Bot..."
+            rows={1}
+            className="w-full bg-transparent border-none focus:ring-0 focus:outline-none resize-none max-h-32 min-h-[40px] py-2.5 px-3 font-body-md text-xs sm:text-sm text-on-surface placeholder:text-outline/70"
+          />
 
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className={`px-4 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+            className={`p-2.5 rounded-full transition-all shrink-0 ${
               input.trim() && !isLoading
-                ? 'bg-primary hover:bg-primary/90 text-white shadow-xs'
-                : 'bg-surface-container-low text-on-surface-variant/50 cursor-not-allowed'
+                ? 'bg-primary text-on-primary shadow-md active:scale-95'
+                : 'bg-surface-container text-outline/50 cursor-not-allowed'
             }`}
           >
-            <span>Consultar</span>
-            <Send className="w-3.5 h-3.5" />
+            <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>send</span>
           </button>
-        </div>
-      </form>
-
-      {/* Nota legal */}
-      <p className="text-[10px] text-on-surface-variant/60 text-center mt-2">
-        BreveApp es una herramienta de orientación y consultoría basada en Terapia Breve Estratégica. No sustituye la atención médica de urgencia.
-      </p>
+        </form>
+      </div>
 
     </div>
   );

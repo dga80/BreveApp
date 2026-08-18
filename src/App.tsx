@@ -4,14 +4,14 @@ import { ChatInterface } from './components/ChatInterface';
 import { CaseDashboard } from './components/CaseDashboard';
 import { KnowledgeLibrary } from './components/KnowledgeLibrary';
 import { SettingsModal } from './components/SettingsModal';
+import { BottomNav } from './components/BottomNav';
 import { CaseProfile, ChatSession, AppSettings, Message, Prescription } from './types';
-import { StorageManager, DEFAULT_SETTINGS } from './lib/storage';
+import { StorageManager } from './lib/storage';
 import { sendChatMessage } from './lib/gemini';
 
 export const App: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings>(() => {
     const s = StorageManager.getSettings();
-    // If not set, check Vite env vars
     if (!s.geminiApiKey) {
       const envKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY || '';
       if (envKey) {
@@ -29,10 +29,9 @@ export const App: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Active case object
   const activeCase = cases.find((c) => c.id === activeCaseId) || cases[0];
+  const activePrescriptionsCount = activeCase?.prescriptions?.filter(p => !p.completed).length || 0;
 
-  // Sync state on activeCaseId change
   useEffect(() => {
     if (activeCaseId) {
       StorageManager.setActiveCaseId(activeCaseId);
@@ -41,11 +40,9 @@ export const App: React.FC = () => {
     }
   }, [activeCaseId]);
 
-  // Handle sending a chat message to the therapist
   const handleSendMessage = async (content: string) => {
     if (!activeCase) return;
 
-    // Check API Key
     if (!settings.geminiApiKey || settings.geminiApiKey.trim() === '') {
       setIsSettingsOpen(true);
       alert('Por favor, configura tu API Key de Gemini en los Ajustes para comenzar.');
@@ -98,7 +95,6 @@ export const App: React.FC = () => {
       setSession(finalSession);
       StorageManager.saveSession(finalSession);
 
-      // If any prescription was automatically detected, suggest it or add it
       if (response.prescriptions && response.prescriptions.length > 0) {
         const existingIds = new Set(activeCase.prescriptions.map(p => p.title.toLowerCase()));
         const newRxs = response.prescriptions.filter(p => !existingIds.has(p.title.toLowerCase()));
@@ -134,7 +130,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Case management
   const handleNewCase = () => {
     const childName = prompt('Nombre del hijo/a o título del caso familiar (ej: "Sofía (9 años)"):');
     if (!childName) return;
@@ -211,7 +206,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-800 flex flex-col">
+    <div className="min-h-screen bg-background text-on-background flex flex-col font-sans antialiased">
       {/* Header */}
       <Header
         cases={cases}
@@ -224,7 +219,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1">
+      <main className="flex-1 pb-16 md:pb-0">
         {activeTab === 'chat' && (
           <ChatInterface
             messages={session?.messages || []}
@@ -248,6 +243,13 @@ export const App: React.FC = () => {
         )}
       </main>
 
+      {/* Mobile Bottom Navigation Bar (Stitch Mobile Spec) */}
+      <BottomNav
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        activePrescriptionsCount={activePrescriptionsCount}
+      />
+
       {/* Settings Modal */}
       <SettingsModal
         isOpen={isSettingsOpen}
@@ -259,4 +261,5 @@ export const App: React.FC = () => {
     </div>
   );
 };
+
 export default App;
