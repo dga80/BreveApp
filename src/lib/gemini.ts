@@ -16,7 +16,11 @@ export async function sendChatMessage({
   activeCase,
   enableSearchGrounding = false
 }: SendMessageOptions): Promise<{ text: string; prescriptions?: Prescription[]; sources?: string[] }> {
-  if (!apiKey || apiKey.trim() === '') {
+  const effectiveApiKey = (apiKey && apiKey.trim() !== '')
+    ? apiKey.trim()
+    : (import.meta as any).env?.VITE_GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY || '';
+
+  if (!effectiveApiKey) {
     throw new Error('No se ha configurado la API Key de Gemini. Por favor, añádela en Ajustes ⚙️.');
   }
 
@@ -46,7 +50,7 @@ ${KNOWLEDGE_CASES.map(c => `[CASO: ${c.title}]\nProblema: ${c.problem}\nError co
   // Clean model name for endpoint
   const targetModel = modelName.includes('/') ? modelName.split('/')[1] : modelName;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey.trim()}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${effectiveApiKey}`;
 
   const requestBody: any = {
     contents: contents,

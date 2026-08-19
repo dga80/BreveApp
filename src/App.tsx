@@ -69,20 +69,20 @@ export const App: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await sendChatMessage(
-        updatedMessages,
+      const response = await sendChatMessage({
+        apiKey: settings.geminiApiKey,
+        modelName: settings.modelName || 'gemini-2.5-flash',
+        messages: updatedMessages,
         activeCase,
-        settings.geminiApiKey,
-        settings.modelName || 'gemini-2.5-flash',
-        settings.enableSearchGrounding ?? true
-      );
+        enableSearchGrounding: settings.enableSearchGrounding ?? true
+      });
 
       const assistantMessage: Message = {
         id: 'msg_a_' + Date.now(),
         role: 'assistant',
         content: response.text,
         timestamp: Date.now(),
-        prescriptions: response.extractedPrescriptions,
+        prescriptions: response.prescriptions,
         sources: response.sources
       };
 
