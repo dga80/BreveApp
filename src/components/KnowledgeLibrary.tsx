@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MARIBEL_PRINCIPLES, KNOWLEDGE_CASES } from '../lib/knowledgeBase';
+import { KNOWLEDGE_CASES } from '../lib/knowledgeBase';
 
 interface KnowledgeLibraryProps {
   onApplyCasePrompt: (prompt: string) => void;

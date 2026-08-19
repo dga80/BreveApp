@@ -35,7 +35,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   
   const [githubToken, setGithubToken] = useState(settings.githubToken || '');
   const [githubRepo, setGithubRepo] = useState(settings.githubRepo || 'dga80/BreveApp');
-  const [githubBranch, setGithubBranch] = useState(settings.githubBranch || 'main');
+  const githubBranch = settings.githubBranch || 'main';
 
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);

@@ -1,5 +1,5 @@
 import { Message, CaseProfile, Prescription } from '../types';
-import { SYSTEM_PROMPT_THERAPIST, KNOWLEDGE_CASES, MARIBEL_PRINCIPLES } from './knowledgeBase';
+import { SYSTEM_PROMPT_THERAPIST, KNOWLEDGE_CASES } from './knowledgeBase';
 
 export interface SendMessageOptions {
   apiKey: string;

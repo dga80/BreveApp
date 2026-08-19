@@ -44,9 +44,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   messages = [],
   onSendMessage,
   isLoading,
-  activeCase,
   onAddPrescription,
-  onStartNewConsultation,
   onOpenHistory
 }) => {
   const [input, setInput] = useState('');

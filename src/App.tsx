@@ -223,12 +223,13 @@ export const App: React.FC = () => {
             caseProfile={activeCase}
             onUpdateCase={handleUpdateCase}
             onNavigateToChat={() => setActiveTab('chat')}
+            onDeleteCase={handleDeleteCase}
           />
         )}
 
         {activeTab === 'knowledge' && (
           <KnowledgeLibrary
-            onApplyStrategy={(prompt) => {
+            onApplyCasePrompt={(prompt: string) => {
               setActiveTab('chat');
               handleSendMessage(prompt);
             }}

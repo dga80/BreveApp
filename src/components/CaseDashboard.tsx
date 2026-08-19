@@ -166,12 +166,28 @@ export const CaseDashboard: React.FC<CaseDashboardProps> = ({
             <h1 className="font-headline-lg text-base sm:text-xl font-bold text-on-surface font-display truncate">
               {activeCase.childName || activeCase.title} {activeCase.childAge ? `, ${activeCase.childAge}` : ''}
             </h1>
-            <button
-              onClick={() => setIsEditingProfile(!isEditingProfile)}
-              className="text-xs text-outline hover:text-primary p-1 shrink-0"
-            >
-              <span className="material-symbols-outlined text-base">edit</span>
-            </button>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                onClick={() => setIsEditingProfile(!isEditingProfile)}
+                className="text-xs text-outline hover:text-primary p-1"
+                title="Editar datos del caso"
+              >
+                <span className="material-symbols-outlined text-base">edit</span>
+              </button>
+              {onDeleteCase && (
+                <button
+                  onClick={() => {
+                    if (confirm(`¿Estás seguro de que deseas eliminar la consulta "${activeCase.title}"?`)) {
+                      onDeleteCase(activeCase.id);
+                    }
+                  }}
+                  className="text-xs text-outline hover:text-red-600 p-1"
+                  title="Eliminar consulta"
+                >
+                  <span className="material-symbols-outlined text-base">delete</span>
+                </button>
+              )}
+            </div>
           </div>
           <p className="font-body-sm text-[11px] sm:text-xs text-outline flex items-center gap-1 mt-0.5 truncate">
             <span className="material-symbols-outlined text-sm">psychology</span> Foco: {activeCase.mainIssue || 'Consulta de Terapia Breve'}
