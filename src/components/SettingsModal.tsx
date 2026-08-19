@@ -9,7 +9,8 @@ import {
   Check, 
   RefreshCw, 
   Save, 
-  ExternalLink
+  ExternalLink,
+  Smartphone
 } from 'lucide-react';
 import { AppSettings } from '../types';
 import { StorageManager } from '../lib/storage';
@@ -20,6 +21,8 @@ interface SettingsModalProps {
   settings: AppSettings;
   onSaveSettings: (newSettings: AppSettings) => void;
   onDataImported: () => void;
+  onOpenInstallModal?: () => void;
+  isInstalled?: boolean;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -27,7 +30,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   settings,
   onSaveSettings,
-  onDataImported
+  onDataImported,
+  onOpenInstallModal,
+  isInstalled = false
 }) => {
   const [geminiApiKey, setGeminiApiKey] = useState(settings.geminiApiKey);
   const [modelName, setModelName] = useState(settings.modelName || 'gemini-2.5-flash');
@@ -270,6 +275,39 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 />
               </label>
             </div>
+          </div>
+
+          {/* Sección 4: Instalación como App (PWA) */}
+          <div className="bg-primary/5 p-4.5 rounded-2xl border border-primary/20 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 font-heading font-bold text-on-surface text-sm">
+                <Smartphone className="w-4 h-4 text-primary" />
+                <span>Instalar Pragmapp en tu Dispositivo</span>
+              </div>
+              {isInstalled && (
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                  Instalada
+                </span>
+              )}
+            </div>
+
+            <p className="text-[11px] text-on-surface-variant/80 leading-relaxed">
+              Abre Pragmapp a pantalla completa sin barras de navegador, con icono propio en tu móvil (Android / iOS) u ordenador.
+            </p>
+
+            {onOpenInstallModal && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenInstallModal();
+                }}
+                className="px-3.5 py-2 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold flex items-center gap-1.5 transition-all text-xs active:scale-98 shadow-xs"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span>{isInstalled ? 'Ver información de instalación' : 'Instalar / Añadir a Pantalla de Inicio'}</span>
+              </button>
+            )}
           </div>
 
         </div>

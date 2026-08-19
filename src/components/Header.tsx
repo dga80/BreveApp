@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, BookOpen, FolderHeart, Plus, RefreshCw, MessageSquare, History } from 'lucide-react';
+import { Settings, BookOpen, FolderHeart, Plus, RefreshCw, MessageSquare, History, Download } from 'lucide-react';
 import { CaseProfile } from '../types';
 import { PragmappLogo } from './PragmappLogo';
 
@@ -12,6 +12,8 @@ interface HeaderProps {
   onTabChange: (tab: 'chat' | 'dashboard' | 'knowledge') => void;
   onOpenSettings: () => void;
   onOpenHistory: () => void;
+  onOpenInstallModal?: () => void;
+  isInstalled?: boolean;
   isSyncing?: boolean;
 }
 
@@ -24,6 +26,8 @@ export const Header: React.FC<HeaderProps> = ({
   onTabChange,
   onOpenSettings,
   onOpenHistory,
+  onOpenInstallModal,
+  isInstalled = false,
   isSyncing
 }) => {
   const activeCase = (cases || []).find(c => c.id === activeCaseId);
@@ -44,6 +48,18 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Fila Derecha: Historial, Selector de Caso y Ajustes */}
           <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
             
+            {/* Botón de Instalar App (Solo si no está instalada aún) */}
+            {!isInstalled && onOpenInstallModal && (
+              <button
+                onClick={onOpenInstallModal}
+                className="px-2 py-1 sm:px-2.5 sm:py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-xl transition-all border border-primary/20 flex items-center gap-1 text-[11px] sm:text-xs font-bold"
+                title="Instalar Pragmapp en tu teléfono o PC"
+              >
+                <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
+                <span className="hidden xs:inline">Instalar</span>
+              </button>
+            )}
+
             {/* Botón de Historial de Consultas */}
             <button
               onClick={onOpenHistory}

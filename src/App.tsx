@@ -4,16 +4,21 @@ import { ChatInterface } from './components/ChatInterface';
 import { CaseDashboard } from './components/CaseDashboard';
 import { KnowledgeLibrary } from './components/KnowledgeLibrary';
 import { SettingsModal } from './components/SettingsModal';
+import { InstallPromptModal } from './components/InstallPromptModal';
 import { BottomNav } from './components/BottomNav';
 import { SplashScreen } from './components/SplashScreen';
 import { HistoryDrawer } from './components/HistoryDrawer';
 import { CaseProfile, ChatSession, AppSettings, Message, Prescription } from './types';
 import { StorageManager } from './lib/storage';
 import { sendChatMessage } from './lib/gemini';
+import { usePWAInstall } from './lib/usePWAInstall';
 
 export const App: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+
+  const { isInstalled, isIOS, canPromptNative, triggerInstall } = usePWAInstall();
 
   const [settings, setSettings] = useState<AppSettings>(() => {
     const s = StorageManager.getSettings();
@@ -188,6 +193,8 @@ export const App: React.FC = () => {
         onTabChange={setActiveTab}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenHistory={() => setIsHistoryOpen(true)}
+        onOpenInstallModal={() => setIsInstallModalOpen(true)}
+        isInstalled={isInstalled}
       />
 
       {/* Drawer de Historial de Consultas */}
@@ -211,9 +218,7 @@ export const App: React.FC = () => {
             messages={session?.messages || []}
             onSendMessage={handleSendMessage}
             isLoading={isLoading}
-            activeCase={activeCase}
             onAddPrescription={handleAddPrescription}
-            onStartNewConsultation={handleCreateNewCase}
             onOpenHistory={() => setIsHistoryOpen(true)}
           />
         )}
@@ -257,6 +262,23 @@ export const App: React.FC = () => {
           setCases(StorageManager.getCases());
           setActiveCaseId(StorageManager.getActiveCaseId());
         }}
+        onOpenInstallModal={() => setIsInstallModalOpen(true)}
+        isInstalled={isInstalled}
+      />
+
+      {/* Modal de Instalación PWA */}
+      <InstallPromptModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+        isIOS={isIOS}
+        onNativeInstall={async () => {
+          const outcome = await triggerInstall();
+          if (outcome === 'accepted') {
+            setIsInstallModalOpen(false);
+          }
+        }}
+        canPromptNative={canPromptNative}
+        isInstalled={isInstalled}
       />
     </div>
   );

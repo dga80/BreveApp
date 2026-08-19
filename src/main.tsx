@@ -63,3 +63,18 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </ErrorBoundary>
   </React.StrictMode>
 );
+
+// Register Service Worker for PWA support
+if ('serviceWorker' in navigator && (import.meta as any).env?.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((registration) => {
+        console.log('Pragmapp ServiceWorker registered successfully:', registration.scope);
+      })
+      .catch((error) => {
+        console.error('Pragmapp ServiceWorker registration failed:', error);
+      });
+  });
+}
+
